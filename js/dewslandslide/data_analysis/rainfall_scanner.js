@@ -56,7 +56,7 @@ function processRainfallData (result) {
 
     result.forEach((record) => {
         const {
-            site: site_code,
+            site_code,
             "1D cml": cumulative_1d,
             "3D cml": cumulative_3d,
             "half of 2yr max": threshold_1d,
@@ -65,7 +65,7 @@ function processRainfallData (result) {
         let data = {};
 
         if (chart_view !== "sites") {
-            const site_details = DYNA_SITES.find(x => x.name === site_code);
+            const site_details = DYNA_SITES.find(x => x.site_code === site_code);
             const parameter = chart_view === "regions" ? region : province;
             const site_property = chart_view === "regions" ? site_details.region : site_details.province;
 
@@ -114,14 +114,14 @@ function processRainfallData (result) {
         }
     });
 
-    createRainfallPercentagesPlot(filtered);    
+    createRainfallPercentagesPlot(filtered);
 }
 
 function getRainfallPercentages () {
     return $.getJSON("../../rainfall_scanner/getRainfallPercentages")
     .catch(({ responseText, status, statusText }) => {
         console.log(`%c► Error Rainfall Scanner\n► Status ${status}: ${statusText}\n\n${responseText}`, "background: rgba(255,127,80,0.3); color: black");
-        
+
         // Error Log for PMS
         const report = {
             type: "error_logs",
@@ -130,7 +130,7 @@ function getRainfallPercentages () {
             report_message: `error on getting Rainfall Percentages ${responseText}`
         };
 
-        PMS.send(report);        
+        PMS.send(report);     
     });
 }
 
@@ -146,7 +146,7 @@ function getSitesWithRegions () {
             report_message: `error on getting Sites with Region ${responseText}`
         };
 
-        PMS.send(report);        
+        PMS.send(report);
     });
 }
 

@@ -148,7 +148,7 @@ function initializeForm () {
                 input = {
                     ...input,
                     start_date: getStartDate("node-summary"),
-                    nodes: input.nodes.replace(/, /g, "-")
+                    node: input.subsurface_node
                 };
                 plotNodeLevelCharts(input);
             }
@@ -177,15 +177,15 @@ function validateForm (form) {
 
         $("#site_code").rules("remove");
         $("#subsurface_column").rules("remove");
-        $("#nodes").rules("remove");
+        $("#subsurface_node").rules("remove");
 
         CHART_PLOTS = new Set();
         switch (submit_btn_id) {
             case "plot-node-level":
-                ["x-accelerometer", "y-accelerometer", "z-accelerometer", "battery"].forEach((plotted) => {
+                ["node"].forEach((plotted) => {
                     CHART_PLOTS.add(plotted);
                 });
-                $("#nodes").rules("add", { required: true });
+                $("#subsurface_node").rules("add", { required: true });
                 // fallthrough
             case "plot-column-level":
                 ["node-health", "data-presence", "communication-health", "subsurface"].forEach((plotted) => {
@@ -239,7 +239,7 @@ function updateBreadcrumb (section) {
 
     switch (section) {
         case "node":
-            let node_names = $("#nodes").val();
+            let node_names = $("#subsurface_node").val();
             node_names = /,/.test(node_names) === true ? `Nodes ${node_names}` : `Node ${node_names}`;
             $main.after($("<li>", {
                 text: node_names
@@ -374,6 +374,12 @@ function createPlotContainer (data_type, source_table, sub_type = null) {
         if (sub_type === "marker") {
             createMarkerTabs(source_table);
         }
+    } else { // data_type is under node plots
+        $(`#${source_table}`)
+        .append($("<div>", {
+            class: `col-sm-12 node-chart ${data_type}-graph`,
+            id: `${source_table}-graph`
+        }));
     }
 }
 

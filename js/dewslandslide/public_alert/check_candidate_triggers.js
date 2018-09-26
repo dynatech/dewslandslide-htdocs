@@ -62,7 +62,7 @@ function separateWithAlertsToNoAlertsOnJSON (alerts_arr) {
     const no_alerts = [];
     const with_alerts = [];
     alerts_arr.forEach((x) => {
-        if (x.alert === "A0") no_alerts.push(x);
+        if (x.public_alert === "A0") no_alerts.push(x);
         else with_alerts.push(x);
     });
     return [with_alerts, no_alerts];
@@ -72,7 +72,8 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
     const return_arr = [];
     with_alerts.forEach((alert) => {
         let entry = alert;
-        const { site: site_code, source: entry_source } = entry;
+        const { site_code, internal_alert } = entry;
+        const entry_source = internal_alert.split("-")[1];
 
         // Set trigger/alert status to valid
         // if seen invalid, or partially invalid, overwrite it
@@ -83,12 +84,21 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
 
         let isValidButNeedsManual = false;
         site_invalids.forEach((invalid_entry) => {
-            const alertIndex = merged_arr.findIndex(elem => elem.name === invalid_entry.site);
+            const alertIndex = merged_arr.findIndex(elem => elem.site_code === invalid_entry.site_code);
             const { alert: public_alert } = invalid_entry;
 
             // Get alerts sources from the alerts array and invalids array
-            const invalid_trigger = invalid_entry.source;
-            const alerts_source = entry_source.split(",");
+            const invalid_trigger = invalid_entry.trigger_source;
+            let alerts_source = entry_source.split("");
+            alerts_source = alerts_source.map((x) => {
+                let trig = null;
+                switch (x.toUpperCase()) {
+                    case "S": trig = "subsurface"; break;
+                    case "R": trig = "rainfall"; break;
+                    default: trig = null; break;
+                }
+                return trig;
+            });
 
             alerts_source.forEach((source) => {
                 if (source === invalid_trigger) {
@@ -102,8 +112,8 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
 
                     let trigger_letter = null;
                     switch (source) {
-                        case "sensor": trigger_letter = "S"; break;
-                        case "rain": trigger_letter = "R"; break;
+                        case "subsurface": trigger_letter = "S"; break;
+                        case "rainfall": trigger_letter = "R"; break;
                         default: trigger_letter = "Z"; break;
                     }
 
@@ -134,7 +144,7 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
                         if (return_obj !== null) {
                             const { invalid_index } = return_obj;
                             entry = Object.assign({}, entry, return_obj);
-                            entry.retriggerTS[invalid_index].invalid = true;
+                            entry.triggers[invalid_index].invalid = true;
                         }
                     }
                 }
@@ -150,7 +160,7 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
 
         let forUpdating = true;
         // Check if alert entry is already updated on latest/overdue table
-        const index = merged_arr.findIndex(elem => elem.name === entry.site);
+        const index = merged_arr.findIndex(elem => elem.site_code === entry.site_code);
 
         if (index !== -1) {
             // Tag the site on merged_arr as cleared
@@ -158,9 +168,9 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
             merged_arr[index].forRelease = true;
 
             const { data_timestamp, trigger_timestamp } = merged_arr[index];
-            const { latest_trigger_timestamp, timestamp } = entry;
+            const { latest_trigger_timestamp, ts } = entry;
 
-            if (moment(data_timestamp).isSame(timestamp)) {
+            if (moment(data_timestamp).isSame(ts)) {
                 forUpdating = false;
             }
 
@@ -179,13 +189,14 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
 
         if (forUpdating) return_arr.push(entry);
     });
+
     return return_arr;
 }
 
 function getAllInvalidTriggersForSite (invalid_arr, site_code) {
     const site_invalids = [];
     for (let i = 0; i < invalid_arr.length; i += 1) {
-        if (invalid_arr[i].site === site_code) { site_invalids.push(invalid_arr[i]); }
+        if (invalid_arr[i].site_code === site_code) { site_invalids.push(invalid_arr[i]); }
     }
     site_invalids.sort((a, b) => {
         if (a.alert > b.alert) return -1;
@@ -197,7 +208,7 @@ function getAllInvalidTriggersForSite (invalid_arr, site_code) {
 function adjustAlertLevelIfInvalidSensor (public_alert, entry) {
     const {
         internal_alert, sensor_alert, ground_alert,
-        retriggerTS: retriggers
+        triggers: retriggers
     } = entry;
     let public_alert_level,
         internal_alert_level,
@@ -235,7 +246,7 @@ function getRetriggerIndex (retriggers, trigger) {
 }
 
 function adjustAlertLevelIfInvalidRain (entry) {
-    const { internal_alert, retriggerTS: retriggers } = entry;
+    const { internal_alert, triggers: retriggers } = entry;
 
     // Rain trigger is plain invalid
     const internal_alert_level = internal_alert.replace(/R0*/g, "");
@@ -249,16 +260,16 @@ function adjustAlertLevelIfInvalidRain (entry) {
 }
 
 function getLatestTrigger (entry) {
-    const retriggers = entry.retriggerTS;
+    const retriggers = entry.triggers;
     let max = null;
     for (let i = 0; i < retriggers.length; i += 1) {
-        if (max == null || moment(max.timestamp).isBefore(retriggers[i].timestamp)) {
+        if (max == null || moment(max.ts).isBefore(retriggers[i].ts)) {
             max = retriggers[i];
         }
     }
     return {
-        latest_trigger_timestamp: max.timestamp,
-        trigger: max.retrigger
+        latest_trigger_timestamp: max.ts,
+        trigger: max.alert
     };
 }
 
@@ -269,13 +280,12 @@ function tagSitesForLowering (merged_arr, no_alerts) {
     // on site but already A0 on json
     merged_arr.forEach((site) => {
         if (typeof site.forRelease === "undefined") {
-            const index = no_alerts.findIndex(elem => elem.site === site.name);
+            const index = no_alerts.findIndex(elem => elem.site_code === site.site_code);
             let x = no_alerts[index];
             lowering_index.push(index);
-
             const { data_timestamp, internal_alert_level } = site;
             // Check if alert for site is A0 and not yet released
-            if (!moment(data_timestamp).isSame(x.timestamp) && internal_alert_level !== "A0" && internal_alert_level !== "ND") {
+            if (!moment(data_timestamp).isSame(x.ts) && internal_alert_level !== "A0" && internal_alert_level !== "ND") {
                 x = Object.assign({}, x, {
                     status: "valid",
                     latest_trigger_timestamp: "end",
@@ -293,17 +303,17 @@ function prepareSitesForExtendedRelease (extended_sites, no_alerts) {
     const return_arr = [];
     const extended_index = [];
     extended_sites.forEach((site) => {
-        const index = no_alerts.findIndex(elem => elem.site === site.name);
+        const index = no_alerts.findIndex(elem => elem.site_code === site.site_code);
         if (index > -1) {
             let x = no_alerts[index];
             extended_index.push(index);
 
             const { data_timestamp, day } = site;
-            const { timestamp } = x;
+            const { ts } = x;
             // Check if alert for site is not yet released and not Day 0
-            if (!moment(data_timestamp).isSame(timestamp) && day > 0) {
+            if (!moment(data_timestamp).isSame(ts) && day > 0) {
                 // Check if JSON entry data timestamp is 11:30 for release
-                if (moment(timestamp).hour() === 11 && moment(timestamp).minute() === 30) {
+                if (moment(ts).hour() === 11 && moment(ts).minute() === 30) {
                     x = Object.assign({}, x, {
                         status: "extended",
                         latest_trigger_timestamp: "extended",
@@ -324,13 +334,13 @@ function prepareSitesForRoutineRelease (no_alerts, excluded_index, invalid_entri
     const wet = [[0, 1, 5, 6, 7, 8, 9, 10, 11], [4, 5, 6, 7, 8, 9]];
     const dry = [[2, 3, 4], [0, 1, 2, 3, 10, 11]];
 
-    const { timestamp: data_timestamp } = no_alerts[0];
+    const { ts: data_timestamp } = no_alerts[0];
     const datetime = moment(data_timestamp);
     const weekday = datetime.isoWeekday(); // 1 - Monday, 7 - Sunday
     let matrix = null;
     const return_arr = [];
     const routine_list = [];
-    
+
     if (datetime.format("HH:mm") === "11:30") {
         if (weekday === 3) matrix = dry;
         else if (weekday === 2 || weekday === 5) matrix = wet;
@@ -339,12 +349,12 @@ function prepareSitesForRoutineRelease (no_alerts, excluded_index, invalid_entri
     if (matrix !== null) {
         const merged = [...no_alerts, ...invalid_entries];
         merged.forEach((entry, index) => {
-            const { site: site_code, timestamp } = entry;
-            const month = moment(timestamp).month();
-            const { season } = dynaslope_sites.find(site => site.name === site_code);
+            const { site_code, ts } = entry;
+            const month = moment(ts).month();
+            const { season } = dynaslope_sites.find(site => site.site_code === site_code);
 
             if (matrix[season - 1].includes(month)) {
-                const is_sent = sent_routine.some(x => x.site_code === entry.site);
+                const is_sent = sent_routine.some(x => x.site_code === entry.site_code);
                 let is_invalid = false;
                 if (typeof entry.status !== "undefined" && entry.status === "invalid") is_invalid = true;
                 let is_excluded = false;
@@ -370,8 +380,8 @@ function prepareSitesForRoutineRelease (no_alerts, excluded_index, invalid_entri
 
         if (routine_list.length !== 0) {
             return_arr.push({
-                site: "routine",
-                timestamp: routine_list[0].timestamp,
+                site_code: "routine",
+                ts: routine_list[0].ts,
                 latest_trigger_timestamp: "routine",
                 trigger: "routine",
                 validity: "routine",

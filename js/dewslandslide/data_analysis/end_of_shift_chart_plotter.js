@@ -133,7 +133,6 @@ function plotEoSSurficial (args) {
 
     getPlotDataForSurficial(input, true)
     .done((series) => {
-        createSurficialMarkersButton(series);
         $(`#${input.site_code}-surficial`).show();
 
         const [{ data: [{ x: last_point_ts }] }] = series;

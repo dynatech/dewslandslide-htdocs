@@ -249,6 +249,11 @@ function getShiftReleases (shift_ts) {
     });
 }
 
+/*************************************************
+ * Take note that the parameter releases
+ * contains all EWI releases for the specific
+ * time period INCLUDING extended releases
+ ************************************************/
 function processShiftReleases (releases) {
     const $recipients_row = $("#mail_recipients_row");
 
@@ -262,7 +267,12 @@ function processShiftReleases (releases) {
     if (releases.length !== 0) {
         $recipients_row.show();
         initializeMailRecipients();
+
+        // Group releases per event_id and filter out sites under
+        // 3-day extended monitoring
         releases_per_event = groupBy(releases, "event_id", "releases");
+
+        const all_qualified_sites = releases_per_event.map(x => x[0].event_id);
 
         const obj = {
             release_ids: [], event_ids: [], sites: []
@@ -270,15 +280,18 @@ function processShiftReleases (releases) {
 
         releases.forEach((release) => {
             const {
-                release_id, event_id, name: site_name, site_id
+                release_id, event_id, site_code, site_id
             } = release;
 
-            obj.release_ids.push(release_id);
+            console.log(all_qualified_sites, release);
+            if (all_qualified_sites.includes(event_id)) {
+                obj.release_ids.push(release_id);
 
-            // Check if not duplicate
-            if (!obj.event_ids.includes(event_id)) {
-                obj.event_ids.push(event_id);
-                obj.sites.push({ site_id, site_name, event_id });
+                // Check if not duplicate
+                if (!obj.event_ids.includes(event_id)) {
+                    obj.event_ids.push(event_id);
+                    obj.sites.push({ site_id, site_code, event_id });
+                }
             }
         });
 
@@ -299,16 +312,17 @@ function processSiteSelectionModal (obj) {
     $("#loading").modal("hide");
     const $modal_cbox = $("#modal-site-checkbox");
     $modal_cbox.empty();
+    console.log(obj);
 
     if (obj !== null) {
         const { sites: { length: len } } = obj;
         let html = "";
         for (let i = 0; i < len; i += 1) {
-            const { site_id, site_name, event_id } = obj.sites[i];
+            const { site_id, site_code, event_id } = obj.sites[i];
             if (i % 9 === 0) html += "<div class=\"row\"><div class=\"col-sm-12\">";
             html += `<label class="checkbox-inline"><input type="checkbox" data-value="${site_id}"` +
-                `data-site="${site_name}" data-event="${event_id}">` +
-                `${site_name.toUpperCase()}</label>`;
+                `data-site="${site_code}" data-event="${event_id}">` +
+                `${site_code.toUpperCase()}</label>`;
             if (i % 9 === 8 || i === len - 1) html += "</div></div>";
         }
 
@@ -324,12 +338,14 @@ function processSiteSelectionModal (obj) {
 function initializeMailRecipients () {
     $("#mail_recipients_row .bootstrap-tagsinput").css("width", "100%");
     const $recipients = $("#recipients_span");
+    const emails = [];
     if (window.location.hostname === "www.dewslandslide.com") {
-        const emails = ["rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com", "phivolcs-senslope@googlegroups.com", "phivolcs-dynaslope@googlegroups.com"];
-        emails.forEach((x) => { $("#recipients").tagsinput("add", x); });
+        emails.push("rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com", "phivolcs-senslope@googlegroups.com", "phivolcs-dynaslope@googlegroups.com");
     } else if ($recipients.html().length === 0) {
+        emails.push("dynaslope.mail@gmail.com");
         $recipients.append("<b style='background-color:yellow;'>TEST SERVER ONLY -- RUS & ASD NOT AUTOMATICALLY TAGGED AS RECIPIENTS FOR SAFEGUARD</b><br/>");
     }
+    emails.forEach((x) => { $("#recipients").tagsinput("add", x); });
 }
 
 /*************************************************
@@ -404,7 +420,7 @@ function prepareReportDataAndHTML ([shift_triggers, all_triggers]) {
     releases_per_event.forEach((event_releases, index) => {
         // Check if site_id is NOT included on the sites_to_do array
         // return quickly if true
-        const [{ site_id: s_id, event_id, name: site_code }] = event_releases;
+        const [{ site_id: s_id, event_id, site_code }] = event_releases;
         const is_present = sites_to_do.some(({ site_id }) => site_id === s_id);
         if (!is_present) return;
 
@@ -451,13 +467,13 @@ function prepareReportDataAndHTML ([shift_triggers, all_triggers]) {
 *************************************************/
 function getReportBackboneData ([event_release], shift_triggers, all_triggers) {
     const {
-        name, event_id,
+        site_code, event_id,
         mt_first, mt_last, ct_first, ct_last
     } = event_release;
 
     const data = {
         ...event_release,
-        site: name,
+        site: site_code,
         mt: `${mt_first} ${mt_last}`,
         ct: `${ct_first} ${ct_last}`
     };
@@ -649,8 +665,8 @@ function getSubsurfaceColumns (site_code) {
 }
 
 function processSubsurfaceColumnDropdown (columns, site_code) {
-    columns.forEach(({ column_name, status }) => {
-        $("#subsurface_option_sample").clone().attr({ id: `subsurface_option_${column_name}`, style: "" })
+    columns.forEach(({ tsm_name, status }) => {
+        $("#subsurface_option_sample").clone().attr({ id: `subsurface_option_${tsm_name}`, style: "" })
         .appendTo(`#graph_checkbox_${site_code} .subsurface_options`);
 
         let attr = "";
@@ -661,9 +677,9 @@ function processSubsurfaceColumnDropdown (columns, site_code) {
         } else if (status === "no_data") label = " (No Data)";
 
         const html_string = "<input type='checkbox' class='subsurface_checkbox' " +
-        `value='subsurface_${column_name}' ${attr}>&emsp;${column_name.toUpperCase() + label}`;
+        `value='subsurface_${tsm_name}' ${attr}>&emsp;${tsm_name.toUpperCase() + label}`;
 
-        $(`#subsurface_option_${column_name} a`).html(html_string);
+        $(`#subsurface_option_${tsm_name} a`).html(html_string);
         $(".dropdown-toggle").dropdown();
     });
 }
@@ -791,7 +807,7 @@ function createInitialSubsurfaceAnalysis (columns) {
     const { length: in_len } = inactive;
     if (in_len > 0) {
         if (in_len > 1) connector = "are";
-        cols = inactive.map(x => x.column_name.toUpperCase());
+        cols = inactive.map(x => x.tsm_name.toUpperCase());
         cols = [cols.slice(0, -1).join(", "), cols.slice(-1)[0]].join(cols.length < 2 ? "" : " and ");
         report += `<b>${cols}</b> ${connector} already deactivated. `;
     }
@@ -799,14 +815,14 @@ function createInitialSubsurfaceAnalysis (columns) {
     const no_data = columns.filter(x => x.status === "no_data");
     const { length: no_len } = no_data;
     if (no_len > 0) {
-        cols = no_data.map(x => x.column_name.toUpperCase());
+        cols = no_data.map(x => x.tsm_name.toUpperCase());
         cols = [cols.slice(0, -1).join(", "), cols.slice(-1)[0]].join(cols.length < 2 ? "" : " and ");
         report += `No available data from <b>${cols}</b> all throughout the shift. `;
     }
 
     const with_data = columns.filter(x => x.status === "with_data");
-    with_data.forEach(({ column_name }) => {
-        report += `<b>${column_name.toUpperCase()}</b> - [write analysis here]. `;
+    with_data.forEach(({ tsm_name }) => {
+        report += `<b>${tsm_name.toUpperCase()}</b> - [write analysis here]. `;
     });
 
     return report;
@@ -903,16 +919,16 @@ function initializeFileUploading () {
         }
 
         for (let i = 0; i < files.length; i += 1) {
-            if (upload_files[site].map(x => x.name).indexOf(files[i].name) === -1) {
+            if (upload_files[site].map(x => x.site_code).indexOf(files[i].site_code) === -1) {
                 upload_files[site].push(files[i]);
-                $(`#files-selected-${site}`).tagsinput("add", files[i].name);
+                $(`#files-selected-${site}`).tagsinput("add", files[i].site_code);
             }
         }
     });
 
     $(document).on("itemRemoved", ".files-selected", (x) => {
         const { item, target: { dataset: { site } } } = x;
-        const index = upload_files[site].map(({ name }) => name).indexOf(item);
+        const index = upload_files[site].map(({ site_code }) => site_code).indexOf(item);
         upload_files[site].splice(index, 1);
     });
 }

@@ -17,12 +17,12 @@ const sites_list = [];
 let merged_arr = [];
 
 const lookup = {
-    r1: ["rain", "rain", "R"],
-    r2: ["rain", "rain", "R"],
-    l2: ["ground", "ground_1", "g"],
-    l3: ["ground", "ground_2", "G"],
-    L2: ["sensor", "sensor_1", "s"],
-    L3: ["sensor", "sensor_2", "S"],
+    r1: ["rainfall", "rainfall", "R"],
+    r2: ["rainfall", "rainfall", "R"],
+    l2: ["surficial", "surficial_1", "g"],
+    l3: ["surficial", "surficial_2", "G"],
+    L2: ["subsurface", "subsurface_1", "s"],
+    L3: ["subsurface", "subsurface_2", "S"],
     d1: ["od", "od", "D"],
     e1: ["eq", "eq", "E"]
 };
@@ -46,7 +46,7 @@ $(document).ready(() => {
 
 function getSites () {
     $.getJSON("../monitoring/getSites", (sites) => {
-        sites.forEach((x) => { sites_list[x.name] = x.id; });
+        sites.forEach((x) => { sites_list[x.site_code] = x.site_id; });
     });
 }
 
@@ -109,11 +109,11 @@ function buildDashboardTables (socket_data) {
             ],
             columns: [
                 {
-                    data: "name",
+                    data: "site_code",
                     render (data, type, full) {
                         return `<b><a href='../monitoring/events/${full.event_id}'>${data.toUpperCase()}</a></b>`;
                     },
-                    name: "name"
+                    name: "site_code"
                 },
                 {
                     data: "event_start",
@@ -146,7 +146,7 @@ function buildDashboardTables (socket_data) {
                 },
                 {
                     render (data, type, full) {
-                        return `<a onclick='chatterboxViaMonitoringDashboard(${JSON.stringify(full)})'><span id='${full.latest_release_id}_sms' class='glyphicon glyphicon-phone'></span></a>&ensp;&ensp;<a><span class='glyphicon glyphicon-envelope' id='${full.latest_release_id}' data-sent='0' data-event-id='${full.event_id}'></span></a>`;
+                        return `<a><span class='glyphicon glyphicon-phone send_ewi_sms' id='${full.latest_release_id}_sms' data-sent='0' data-event-id='${full.event_id}_sms' ></span></a>&ensp;&ensp;<a><span class='glyphicon glyphicon-envelope' id='${full.latest_release_id}' data-sent='0' data-event-id='${full.event_id}'></span></a>`;
                     }
                 }
             ],
@@ -189,9 +189,9 @@ function buildDashboardTables (socket_data) {
             ],
             columns: [
                 {
-                    data: "name",
+                    data: "site_code",
                     render (data, type, full) { return `<b><a href='../monitoring/events/${full.event_id}'>${data.toUpperCase()}</a></b>`; },
-                    name: "name"
+                    name: "site_code"
                 },
                 {
                     data: "validity",
@@ -210,7 +210,7 @@ function buildDashboardTables (socket_data) {
                 },
                 {
                     render (data, type, full) {
-                        return `<a onclick='chatterboxViaMonitoringDashboard(${JSON.stringify(full)})'><span id='${full.latest_release_id}_sms' class='glyphicon glyphicon-phone'></span></a>&ensp;&ensp;<a><span class='glyphicon glyphicon-envelope' id='${full.latest_release_id}' data-sent='0' data-event-id='${full.event_id}'></span></a>`;
+                        return `<a><span class='glyphicon glyphicon-phone send_ewi_extended_sms'></span></a>&ensp;&ensp;<a><span class='glyphicon glyphicon-envelope' id='${full.latest_release_id}' data-sent='0' data-event-id='${full.event_id}'></span></a>`;
                     }
                 }
             ],
@@ -248,16 +248,16 @@ function buildDashboardTables (socket_data) {
             ],
             columns: [
                 {
-                    data: "site",
+                    data: "site_code",
                     render (data, type, full) { return `<b>${data.toUpperCase()}</b>`; },
-                    name: "site"
+                    name: "site_code"
                 },
                 {
                     data: "data_timestamp",
                     render (data, type, full) {
-                        const { timestamp } = full;
-                        if (timestamp == null) return "No new triggers";
-                        return moment(timestamp).format("DD MMMM YYYY HH:mm");
+                        const { ts } = full;
+                        if (ts == null) return "No new triggers";
+                        return moment(ts).format("DD MMMM YYYY HH:mm");
                     },
                     name: "data_timestamp"
                 },
@@ -363,16 +363,16 @@ function initializeCandidateTriggersIconOnClick () {
         entry = {};
         const i = $(currentTarget).parents("tr");
         current_row = candidate_table.row(i).data();
-        const { site, timestamp } = current_row;
-        $("#timestamp_entry").val(timestamp);
+        const { site_code, ts } = current_row;
+        $("#timestamp_entry").val(ts);
 
-        if (site === "routine") {
+        if (site_code === "routine") {
             const { routine_list } = current_row;
             const a0_sites = [];
             const nd_sites = [];
             routine_list.forEach((row) => {
-                const { internal_alert, site: site_code } = row;
-                const site_uc = site_code.toUpperCase();
+                const { internal_alert, site_code: sc } = row;
+                const site_uc = sc.toUpperCase();
                 if (internal_alert === "A0") a0_sites.push(site_uc);
                 else nd_sites.push(site_uc);
             });
@@ -397,16 +397,16 @@ function initializeCandidateTriggersIconOnClick () {
 
             const {
                 internal_alert,
-                status, rain_alert
+                status, rainfall
             } = current_row;
             $("#internal_alert_level").val(internal_alert);
-            $("#site").val(sites_list[site]);
+            $("#site_id").val(sites_list[site_code]);
             $("#comments").val("");
 
             // Search candidate trigger if existing on latest and overdue
             const { latest, overdue, extended } = ongoing;
             merged_arr = [...latest, ...overdue];
-            const index = merged_arr.map(x => x.name).indexOf(site);
+            const index = merged_arr.map(x => x.site_code).indexOf(site_code);
             let previous = null;
             let enableReleaseButton = false;
 
@@ -416,14 +416,14 @@ function initializeCandidateTriggersIconOnClick () {
                 entry.previous_validity = previous.validity;
 
                 if (internal_alert === "A0" || internal_alert === "ND") {
-                    if (moment(previous.validity).isAfter(moment(timestamp).add(30, "minutes"))) {
+                    if (moment(previous.validity).isAfter(moment(ts).add(30, "minutes"))) {
                         entry.status = "invalid";
                     } else entry.status = "extended";
                 } else entry.status = "on-going";
 
                 entry.event_id = previous.event_id;
             } else {
-                const index_ex = extended.map(x => x.name).indexOf(site);
+                const index_ex = extended.map(x => x.site_code).indexOf(site_code);
                 entry.trigger_list = showModalTriggers(current_row, null);
                 enableReleaseButton = true;
 
@@ -439,14 +439,14 @@ function initializeCandidateTriggersIconOnClick () {
 
             // Check data timestamp for regular release (x:30)
             // Disable send button if not else enable button
-            const hour = moment(timestamp).hour();
-            const minute = moment(timestamp).minutes();
+            const hour = moment(ts).hour();
+            const minute = moment(ts).minutes();
             if ((hour % 4 === 3 && minute === 30) || enableReleaseButton) $("#release").prop("disabled", false);
             else $("#release").prop("disabled", true);
 
             // Insert X on internal alert if Rx is not yet automatic on JSON
-            entry.rain_alert = rain_alert;
-            if (rain_alert === "rx") {
+            entry.rainfall = rainfall;
+            if (rainfall === "rx") {
                 let internal = internal_alert;
                 if (internal.indexOf("x") === -1) {
                     if (internal.indexOf("R") > -1) internal = internal.replace(/R/g, "Rx");
@@ -483,14 +483,14 @@ function initializeTriggerSwitchOnClick () {
 }
 
 function showModalTriggers (row, latest) {
-    const retrigger_list = typeof row.retriggerTS !== "undefined" ? row.retriggerTS : null;
+    const retrigger_list = typeof row.triggers !== "undefined" ? row.triggers : null;
     const qualified_retriggers = [];
 
     // Get triggers ONLY if they are not yet saved
     // candidate trigger > latest trigger
     if (retrigger_list != null) {
         retrigger_list.forEach((x) => {
-            if (moment(x.timestamp).isAfter(latest) || latest == null) {
+            if (moment(x.ts).isAfter(latest) || latest == null) {
                 qualified_retriggers.push(x);
             }
         });
@@ -511,17 +511,17 @@ function showModalTriggers (row, latest) {
 
     if (retrigger_list != null) {
         qualified_retriggers.forEach((x) => {
-            const y = lookup[x.retrigger];
+            const y = lookup[x.alert];
             $(`#${y[0]}_area`).show();
-            $(`#trigger_${y[1]}`).val(x.timestamp).prop({ readonly: true, disabled: false });
-            const info = y[2] === "E" ? row.tech_info[`${y[0]}_tech`].info : row.tech_info[`${y[0]}_tech`];
+            $(`#trigger_${y[1]}`).val(x.ts).prop({ readonly: true, disabled: false });
+            const info = y[2] === "E" ? row.tech_info[`${y[0]}`].info : row.tech_info[`${y[0]}`];
             $(`#trigger_${y[1]}_info`).val(info).prop("disabled", false);
 
             $(`.trigger_switch[value=${y[0]}]`).prop("disabled", false);
 
             if (y[2] === "D") $(".od_group, #reason").prop("disabled", false);
             else if (y[2] === "E") {
-                const { magnitude, longitude, latitude } = row.tech_info[`${y[1]}_tech`];
+                const { magnitude, longitude, latitude } = row.tech_info[`${y[1]}`];
                 $("#magnitude").val(magnitude).prop("disabled", false);
                 $("#longitude").val(longitude).prop("disabled", false);
                 $("#latitude").val(latitude).prop("disabled", false);
@@ -540,12 +540,17 @@ function showInvalidTriggersOnModal (row) {
         $.each(invalid_list, (count, trigger) => {
             let template = $("#invalid_template").html();
             template = $(template).show();
-            const x = `#${trigger.source}_area`;
+            const {
+                trigger_source, ts_last_retrigger,
+                iomp, remarks
+            } = trigger;
+
+            const x = `#${trigger_source}_area`;
             $(`${x} .invalid_area`).append(template);
-            $(`${x} .invalid_area #timestamp`).text(moment(trigger.timestamp).format("MMM. D, YYYY, H:mm"));
-            $(`${x} .invalid_area #staff`).text(trigger.iomp);
-            const remarks = trigger.remarks === "" ? "---" : trigger.remarks;
-            $(`${x} .invalid_area #remarks`).text(remarks);
+            $(`${x} .invalid_area #timestamp`).text(moment(ts_last_retrigger).format("MMM. D, YYYY, H:mm"));
+            $(`${x} .invalid_area #staff`).text(iomp);
+            const temp = remarks === "" ? "---" : remarks;
+            $(`${x} .invalid_area #remarks`).text(temp);
         });
     }
 }
@@ -642,23 +647,23 @@ function initializeReleaseModalForm () {
     modal_form = $("#modalForm").validate({
         debug: true,
         rules: {
-            site: "required",
+            site_code: "required",
             timestamp_entry: "required",
             release_time: "required",
-            trigger_rain: "required",
+            trigger_rainfall: "required",
             trigger_eq: "required",
             trigger_od: "required",
-            trigger_ground_1: "required",
-            trigger_ground_2: "required",
-            trigger_sensor_1: "required",
-            trigger_sensor_2: "required",
+            trigger_surficial_1: "required",
+            trigger_surficial_2: "required",
+            trigger_subsurface_1: "required",
+            trigger_subsurface_2: "required",
             trigger_rain_info: "required",
             trigger_eq_info: "required",
             trigger_od_info: "required",
-            trigger_ground_1_info: "required",
-            trigger_ground_2_info: "required",
-            trigger_sensor_1_info: "required",
-            trigger_sensor_2_info: "required",
+            trigger_surficial_1_info: "required",
+            trigger_surficial_2_info: "required",
+            trigger_subsurface_1_info: "required",
+            trigger_subsurface_2_info: "required",
             reporter_2: "required",
             comments: {
                 isInvalid: true
@@ -697,7 +702,7 @@ function initializeReleaseModalForm () {
                 if (element.parent().is(".datetime")) element.next("span").css("right", "15px");
                 if (element.is("input[type=number]")) element.next("span").css({ top: "24px", right: "20px" });
                 if (element.is("textarea") || element.is("select")) element.next("span").css({ top: "24px", right: "22px" });
-                if (element.attr("id") == "reason") element.next("span").css({ top: "0", right: "0" });
+                if (element.attr("id") === "reason") element.next("span").css({ top: "0", right: "0" });
             }
         },
         success (label, element) {
@@ -787,7 +792,7 @@ function initializeReleaseModalForm () {
                     const extend = /ND|[sg]0/gi.test(final.internal_alert_level);
                     if (list == null && moment(previous_validity).isSame(moment(final.timestamp_entry).add(30, "minutes"))) {
                         if (extend) final.extend_ND = "set";
-                        if (entry.rain_alert === "rx") {
+                        if (entry.rainfall === "rx") {
                             final.extend_rain_x = "set";
                         }
                     }

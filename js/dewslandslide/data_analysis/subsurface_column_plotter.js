@@ -28,10 +28,10 @@ function getSiteSubsurfaceColumns (site_code) {
 }
 
 function delegateSubsurfaceColumnsOnDropDown (column_list) {
-    column_list.forEach(({ name: site_code }) => {
+    column_list.forEach(({ tsm_name: column }) => {
         $("#subsurface_column").append($("<option>", {
-            value: site_code,
-            text: `${site_code.toUpperCase()}`,
+            value: column,
+            text: `${column.toUpperCase()}`,
             class: "appended-option"
         }));
     });

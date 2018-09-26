@@ -398,7 +398,7 @@ function loadTables()
                 }
             },
             { 
-                "data": "name",
+                "data": "site_code",
                 "render": function (data, type, full, meta) {
                     if( data == null ) return "---";
                     else return data.toUpperCase();
@@ -472,7 +472,7 @@ function loadTables()
                 }
             },
             { 
-                "data": "name",
+                "data": "site_code",
                 "render": function (data, type, full, meta) {
                     if( data == null ) return "---";
                     else return data.toUpperCase();

@@ -4,18 +4,17 @@ $(document).ready(() => {
         subsurface_column: "agbta",
         start_date: "2016-01-15",
         end_date: "2016-01-21",
-        node: "1-3-5"
+        node: 1
     };
 
     // plotNodeLevelCharts(input);
 
-    initializeNodeDropdown();
     initializeNodeSummaryDurationDropdownOnClick();
-    initializeNodeClearButtonOnClick();
 });
 
 function processNodeDropDown (subsurface_column) {
-    clearSelectedNodes();
+    $("#subsurface_node").val("")
+    .find("option.appended-option").remove();
 
     getSiteColumnNodeCount(subsurface_column)
     .done(delegateNodeNumbersOnDropdown)
@@ -29,52 +28,13 @@ function getSiteColumnNodeCount (subsurface_column) {
 }
 
 function delegateNodeNumbersOnDropdown (node_count) {
-    $nodes = $("#node-list");
-    $nodes.empty();
-    for (let counter = 0; counter < node_count; counter += 1) {
-        const count = counter + 1;
-        $nodes.append("<li>" +
-            `<a class="small" tabIndex="3" data-value="${count}" data-event="${count}">` +
-            `<input type="checkbox" class="node-checkbox" name="node-checkbox"/>&nbsp;Node ${count}` +
-            "</a></li>");
+    for (let counter = 1; counter <= node_count; counter += 1) {
+        $("#subsurface_node").append($("<option>", {
+            value: counter,
+            text: `Node ${counter}`,
+            class: "appended-option"
+        }));
     }
-}
-
-let selected_nodes = [];
-function initializeNodeDropdown () {
-    $("body").on("click", "#node-list.dropdown-menu a", ({ currentTarget }) => {
-        const $target = $(currentTarget);
-        const val = parseInt($target.attr("data-value"), 10);
-        const $inp = $target.find("input");
-        const idx = selected_nodes.indexOf(val);
-
-        if (idx > -1) {
-            selected_nodes.splice(idx, 1);
-            setTimeout(() => { $inp.prop("checked", false); }, 0);
-        } else {
-            selected_nodes.push(val);
-            setTimeout(() => { $inp.prop("checked", true); }, 0);
-        }
-
-        const sorted = selected_nodes.sort((a, b) => a - b);
-
-        $(currentTarget).blur();
-        $("#nodes").val(sorted.join(", "));
-
-        updateBreadcrumb("node");
-
-        return false;
-    });
-}
-
-function initializeNodeClearButtonOnClick () {
-    $("#clear-nodes").click(clearSelectedNodes);
-}
-
-function clearSelectedNodes () {
-    selected_nodes = [];
-    $(".node-checkbox").prop("checked", false);
-    $("#nodes").val("");
 }
 
 function initializeNodeSummaryDurationDropdownOnClick () {
@@ -91,7 +51,7 @@ function initializeNodeSummaryDurationDropdownOnClick () {
             subsurface_column: $("#subsurface_column").val(),
             start_date: getStartDate(parent_id.replace("-duration", "")),
             end_date: moment($("#data_timestamp").val()).format("YYYY-MM-DDTHH:mm"),
-            nodes: $("#nodes").val().replace(/, /g, "-")
+            node: $("#subsurface_node").val()
         };
 
         plotNodeLevelCharts(form);
@@ -105,8 +65,18 @@ function plotNodeLevelCharts (input) {
     .done((subsurface_node_data) => {
         console.log(subsurface_node_data);
         subsurface_node_data.forEach((series) => {
-            createGeneralNodeChart(series, input);
-            createSVG(series.series_name, input.subsurface_column);
+            console.log(series);
+            const { series_name, data: nodes } = series;
+            nodes.forEach((node_arr) => {
+                const { node_name, series: node_series } = node_arr;
+                const source_name = node_name.replace("node_", "");
+                const container_id = `${series_name}-${node_name}`;
+                const final_series = hideByDefaultRawSeries(node_series);
+                createPlotContainer(series_name, container_id);
+                createGeneralNodeChart(container_id, final_series, input, source_name);
+            });
+            synchronizeNodeChartsPerPlotType(series_name);
+            createSVG("node");
         });
         $("#subsurface-node-plots .loading-bar").hide();
     })
@@ -115,16 +85,24 @@ function plotNodeLevelCharts (input) {
     });
 }
 
-function getPlotDataForNode ({
-    subsurface_column, start_date, end_date, nodes
-}) {
-    return $.getJSON(`../site_analysis/getPlotDataForNode/${subsurface_column}/${start_date}/${end_date}/${nodes}`);
+function hideByDefaultRawSeries (series) {
+    series.forEach((node_arr) => {
+        if (node_arr.name.includes("Raw")) node_arr.visible = false;
+    });
+    return series;
 }
 
-function createGeneralNodeChart ({ series_name, data }, input) {
+function getPlotDataForNode ({
+    subsurface_column, start_date, end_date, node
+}) {
+    return $.getJSON(`../site_analysis/getPlotDataForNode/${subsurface_column}/${start_date}/${end_date}/${node}`);
+}
+
+function createGeneralNodeChart (series_name, data, input, source_name) {
     const { subsurface_column, start_date, end_date } = input;
     const cap = series_name === "battery" ? 1 : 3;
     const title = series_name.slice(0, cap).toUpperCase() + series_name.slice(cap);
+
     $(`#${series_name}-graph`).highcharts({
         series: data,
         chart: {
@@ -132,25 +110,23 @@ function createGeneralNodeChart ({ series_name, data }, input) {
             zoomType: "x",
             panning: true,
             panKey: "shift",
-            height: 400,
-            resetZoomButton: {
-                position: {
-                    x: 0,
-                    y: -30
-                }
-            }
+            height: 150
         },
         title: {
-            text: `<b>${title} Plot of ${subsurface_column.toUpperCase()}</b>`,
-            style: { fontSize: "14px" },
-            margin: 20,
-            y: 16
+            text: "",
+            style: { fontSize: "0" }
+            // text: `<b>${title} Plot of ${subsurface_column.toUpperCase()}</b>`,
+            // style: { fontSize: "10px" },
+            // margin: 20,
+            // y: 16
         },
         subtitle: {
-            text: `Range: <b>${moment(start_date).format("D MMM YYYY, HH:mm")} - ${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
-            style: { fontSize: "11px" }
+            text: `Source: <b>Node ${source_name}</b><br/>Range: <b>${moment(start_date).format("D MMM YYYY, HH:mm")} - ${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            style: { fontSize: "9px" }
         },
         xAxis: {
+            min: Date.parse(start_date),
+            max: Date.parse(end_date),
             type: "datetime",
             dateTimeLabelFormats: {
                 month: "%e. %b %Y",
@@ -167,7 +143,7 @@ function createGeneralNodeChart ({ series_name, data }, input) {
         },
         tooltip: {
             crosshairs: true,
-            split: true
+            shared: true
         },
 
         plotOptions: {
@@ -180,7 +156,7 @@ function createGeneralNodeChart ({ series_name, data }, input) {
         },
         legend: {
             itemStyle: {
-                fontSize: "11px"
+                fontSize: "10px"
             },
             layout: "vertical",
             align: "right",
@@ -190,5 +166,55 @@ function createGeneralNodeChart ({ series_name, data }, input) {
         credits: {
             enabled: false
         }
+    });
+}
+
+function synchronizeNodeChartsPerPlotType (series_name) {
+    $(`#${series_name}-plots`).bind("mousemove touchmove touchstart", (e) => {
+        let points;
+        let secSeriesIndex = 1;
+
+        $(`.node-chart.${series_name}-graph`).each((i, elem) => {
+            const chart = $(`#${elem.id}`).highcharts();
+            e = chart.pointer.normalize(e); // Find coordinates within the chart
+            points = [
+                chart.series[0].searchPoint(e, true),
+                chart.series[1].searchPoint(e, true)
+            ]; // Get the hovered point
+
+            if (points[0] && points[1]) {
+                if (!points[0].series.visible) {
+                    points.shift();
+                    secSeriesIndex = 0;
+                }
+                if (!points[secSeriesIndex].series.visible) {
+                    points.splice(secSeriesIndex, 1);
+                }
+                if (points.length) {
+                    chart.tooltip.refresh(points); // Show the tooltip
+                    chart.xAxis[0].drawCrosshair(e, points[0]); // Show the crosshair
+                }
+            }
+        });
+
+        // for (let i = 0; i < Highcharts.charts.length; i += 1) {
+        //     chart = Highcharts.charts[i];
+        //     e = chart.pointer.normalize(e); // Find coordinates within the chart
+        //     points = [chart.series[0].searchPoint(e, true), chart.series[1].searchPoint(e, true)]; // Get the hovered point
+
+        //     if (points[0] && points[1]) {
+        //         if (!points[0].series.visible) {
+        //             points.shift();
+        //             secSeriesIndex = 0;
+        //         }
+        //         if (!points[secSeriesIndex].series.visible) {
+        //             points.splice(secSeriesIndex,1);
+        //         }
+        //         if (points.length) {
+        //             chart.tooltip.refresh(points); // Show the tooltip
+        //             chart.xAxis[0].drawCrosshair(e, points[0]); // Show the crosshair
+        //         }
+        //     }
+        // }
     });
 }

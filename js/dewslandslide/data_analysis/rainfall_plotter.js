@@ -125,16 +125,17 @@ function getRainDataSourcesPerSite (site_code) {
 }
 
 function createRainSourcesButton (sources) {
+    console.log(sources);
     $btn_group = $("#rainfall-sources-btn-group");
     $btn_group.empty();
-    sources.forEach(({ source_table }) => {
-        const txt = source_table.toUpperCase();
-        const table = isFinite(source_table) ? `NOAH ${txt}` : txt;
+    sources.forEach(({ gauge_name }) => {
+        const txt = gauge_name.toUpperCase().replace("RAIN_", " ").replace("_", " ");
+        const table = isFinite(gauge_name) ? `NOAH ${txt}` : txt;
 
         $btn_group.append($("<button>", {
             type: "button",
             class: "btn btn-primary btn-sm",
-            value: source_table,
+            value: gauge_name,
             text: `${table}`,
             "data-loaded": false
         }));
@@ -154,9 +155,9 @@ function getPlotDataForRainfall (args, isEOS = false) {
 
 function plotRainfall (datalist, temp) {
     datalist.forEach((source) => {
-        const { null_ranges, source_table } = source;
+        const { null_ranges, gauge_name } = source;
 
-        createPlotContainer("rainfall", source_table);
+        createPlotContainer("rainfall", gauge_name);
 
         const series_data = [];
         const max_rval_data = [];
@@ -181,10 +182,10 @@ function plotRainfall (datalist, temp) {
     });
 }
 
-function createRainPlotSubtitle (distance, source_table) {
-    let source = source_table.toUpperCase();
-    if (isFinite(source_table)) {
-        source = `NOAH ${source_table}`;
+function createRainPlotSubtitle (distance, gauge_name) {
+    let source = gauge_name.toUpperCase();
+    if (isFinite(gauge_name)) {
+        source = `NOAH ${gauge_name}`;
     }
     const subtitle = distance === null ? source : `${source} (${distance} KM)`;
     return subtitle;
@@ -193,10 +194,10 @@ function createRainPlotSubtitle (distance, source_table) {
 function createCumulativeRainfallChart (data, temp, source) {
     const { site_code, start_date, end_date } = temp;
     const {
-        distance, max_72h, max_rain_2year, source_table
+        distance, max_72h, threshold_value: max_rain_2year, gauge_name
     } = source;
 
-    const container = `#${source_table}-cumulative`;
+    const container = `#${gauge_name}-cumulative`;
 
     Highcharts.setOptions({ global: { timezoneOffset: -8 * 60 } });
     $(container).highcharts({
@@ -221,7 +222,7 @@ function createCumulativeRainfallChart (data, temp, source) {
             y: 16
         },
         subtitle: {
-            text: `Source: <b>${createRainPlotSubtitle(distance, source_table)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            text: `Source: <b>${createRainPlotSubtitle(distance, gauge_name)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
             style: { fontSize: "11px" }
         },
         xAxis: {
@@ -290,10 +291,10 @@ function createCumulativeRainfallChart (data, temp, source) {
 function createInstantaneousRainfallChart (data, temp, source, null_processed) {
     const { site_code, start_date, end_date } = temp;
     const {
-        distance, max_rval, source_table
+        distance, max_rval, gauge_name
     } = source;
 
-    const container = `#${source_table}-instantaneous`;
+    const container = `#${gauge_name}-instantaneous`;
 
     $(container).highcharts({
         series: data,
@@ -316,7 +317,7 @@ function createInstantaneousRainfallChart (data, temp, source, null_processed) {
             y: 16
         },
         subtitle: {
-            text: `Source : <b>${createRainPlotSubtitle(distance, source_table)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            text: `Source : <b>${createRainPlotSubtitle(distance, gauge_name)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
             style: { fontSize: "11px" }
         },
         xAxis: {

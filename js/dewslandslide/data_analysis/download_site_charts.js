@@ -32,11 +32,10 @@ function createSVG (plot_type) {
         case "node-health": // fall through
         case "data-presence":
         case "communication-health":
-        case "x-accelerometer":
-        case "y-accelerometer":
-        case "z-accelerometer": // fall through
-        case "battery":
             createColumnSummaryAndNodeSVG(plot_type);
+            break;
+        case "node":
+            createNodeSVG();
             break;
         case "subsurface-column":
             createSubsurfaceSVG();
@@ -99,6 +98,21 @@ function createColumnSummaryAndNodeSVG (type) {
     $container.append(chart_svg);
 }
 
+function createNodeSVG () {
+    const $container = $("#node-svg");
+    $container.empty();
+    const tag = "node-chart";
+    const charts = Highcharts.charts.filter((x) => {
+        if (typeof x !== "undefined") return $(x.renderTo).hasClass(tag);
+        return false;
+    });
+    charts.forEach((chart) => {
+        const node_svg = chart.getSVG();
+        $container.append(node_svg);
+    });
+    delegateChartSVGPosition("node");
+}
+
 function createSubsurfaceSVG () {
     const $container = $("#subsurface-svg");
     $container.empty();
@@ -129,6 +143,7 @@ function delegateChartSVGPosition (type) {
 
     if (type === "rainfall") chart_count = 8;
     else if (type === "subsurface") chart_count = 6;
+    else if (type === "node") delegateNodeChartSVGPosition();
 
     for (let counter = 1; counter <= chart_count; counter += 1) {
         const tag = `#${type}-svg svg:nth-child(${counter})`;
@@ -145,6 +160,18 @@ function delegateChartSVGPosition (type) {
             });
             y_axis_odd += returnYaxisValue(type);
         }
+    }
+}
+
+function delegateNodeChartSVGPosition () {
+    let y_value = 0;
+    for (let counter = 1; counter <= 12; counter += 1) {
+        const tag = `#node-svg svg:nth-child(${counter})`;
+        $(tag).attr({
+            x: 0,
+            y: y_value
+        });
+        y_value += 160;
     }
 }
 

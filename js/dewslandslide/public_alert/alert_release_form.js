@@ -101,10 +101,10 @@ function mainTabGeneralxRoutine () {
         if ($(this).attr("id") === "general") {
             $("#sites_area").slideUp();
             $("#operational_area").slideDown();
-            $("#site").val("").trigger("change");
+            $("#site_id").val("").trigger("change");
             $form_group.each(function (i) {
                 $(this).switchClass(`col-sm-${div_size.b[i]}`, `col-sm-${div_size.a[i]}`, 500, "easeOutQuart", () => {
-                    $("#site").parent().prop("style", "display: block");
+                    $("#site_id").parent().prop("style", "display: block");
                 });
             });
         } else {
@@ -116,7 +116,7 @@ function mainTabGeneralxRoutine () {
             $("#site_info_area").slideUp();
             $("#public_alert_level").val("").trigger("change");
             $("#public_alert_level option[value=A3], #public_alert_level option[value=A2], #public_alert_level option[value=A1]").prop("disabled", true);
-            $("#site").val("").parent().prop("style", "display: none");
+            $("#site_id").val("").parent().prop("style", "display: none");
             $form_group.each(function (i) {
                 $(this).switchClass(`col-sm-${div_size.a[i]}`, `col-sm-${div_size.b[i]}`, 500, "easeInQuart");
             });
@@ -147,8 +147,8 @@ function ondataTimestampChange () {
  *
 *******************************************/
 function onSiteChange () {
-    $("#site").change(() => {
-        const val = $("#site").val() === "" ? 0 : $("#site").val();
+    $("#site_id").change(({ currentTarget: { value } }) => {
+        const site_id = value === "" ? 0 : value;
         saved_triggers = [];
 
         // Clear all trigger timestamps area
@@ -160,7 +160,7 @@ function onSiteChange () {
 
         $("#heightened-features-div").hide();
 
-        getLastSiteEvent(val)
+        getLastSiteEvent(site_id)
         .done((event) => {
             // Reset fields on site_info_area
             $("#status").html("Monitoring Status: <br><b>[STATUS]</b>");
@@ -281,7 +281,7 @@ function onSiteChange () {
             $(".cbox_trigger_nd").trigger("change");
 
             const desc_lookup = {
-                R: "#rain_desc", E: "#eq_desc", G: "#ground_desc", S: "#sensor_desc", D: "#od_desc", M: "#manifestation_desc"
+                R: "#rainfall_desc", E: "#eq_desc", G: "#surficial_desc", S: "#subsurface_desc", D: "#od_desc", M: "#manifestation_desc"
             };
 
             grouped_triggers.forEach((trigger_group) => {
@@ -418,11 +418,11 @@ function publicAlertHandler (alert_level) {
  *  Procedures on Trigger Switch Click
  *
 *******************************************/
-const lookup = [{ value: "rs", area_div: "rain_area", isVisible: false },
+const lookup = [{ value: "rs", area_div: "rainfall_area", isVisible: false },
     { value: "es", area_div: "eq_area", isVisible: false },
     { value: "ds", area_div: "od_area", isVisible: false },
-    { value: "gs", area_div: "ground_area", isVisible: false },
-    { value: "ss", area_div: "sensor_area", isVisible: false },
+    { value: "gs", area_div: "surficial_area", isVisible: false },
+    { value: "ss", area_div: "subsurface_area", isVisible: false },
     { value: "ms", area_div: "manifestation_area", isVisible: false }];
 
 function onTriggerSwitchClick () {
@@ -466,35 +466,38 @@ function onOperationalTriggersAndNoDataClick () {
         internal_alert_div.val(temp);
     });
 
-    $(".cbox_trigger, .cbox_trigger_nd").change(function () {
+    $(".cbox_trigger, .cbox_trigger_nd").change(({ currentTarget }) => {
         trigger_list = [];
         trigger_list = [...saved_triggers];
+        const { value: trigger_letter } = currentTarget;
 
         // Disable trigger divs on ND check
-        if (this.value.indexOf("0") >= 0) disableDivsOnNoDataClick(this);
+        if (trigger_letter.indexOf("0") >= 0) onNoDataClick(currentTarget);
         else {
-            const isSpecificTriggerReleased = trigger_list.some(x => x === this.value);
-            const temp_letter = this.value === "R" ? this.value : this.value.toLowerCase();
+            const isSpecificTriggerReleased = trigger_list.some((x) => {
+                return x.toUpperCase() === trigger_letter.toUpperCase();
+            });
+            const temp_letter = trigger_letter === "R" ? trigger_letter : trigger_letter.toLowerCase();
             const nd_trigger = `.cbox_trigger_nd[value=${temp_letter}0]`;
 
             // if cbox trigger is checked, uncheck and disable corresponding ND
-            if ($(`.cbox_trigger[value=${this.value}]`).is(":checked")) {
+            if ($(`.cbox_trigger[value=${trigger_letter}]`).is(":checked")) {
                 $(nd_trigger).prop({ disabled: true, checked: false });
                 $(nd_trigger).trigger("change");
 
             // if trigger already occurred or released, make ND button available
             } else if (isSpecificTriggerReleased) {
                 // Except if non-triggering features is checked; make ND unavailable
-                if ($("#nt_feature_cbox").is(":checked") && this.value.toLowerCase() === "m") {
+                if ($("#nt_feature_cbox").is(":checked") && trigger_letter.toLowerCase() === "m") {
                     $(nd_trigger).prop({ disabled: true });
                 } else $(nd_trigger).prop({ disabled: false });
             }
         }
 
         // Disable Timestamp Input Validation Checkbox Fields
-        const $timestamp_div = $(this).closest("span").next("div").children("input");
+        const $timestamp_div = $(currentTarget).closest("span").next("div").children("input");
         const $tech_info = $(`#${$timestamp_div.attr("id")}_info`);
-        if ($(`.cbox_trigger[value=${this.value}]`).is(":checked")) {
+        if ($(`.cbox_trigger[value=${trigger_letter}]`).is(":checked")) {
             $timestamp_div.prop("disabled", false);
             $tech_info.prop("disabled", false);
         } else {
@@ -525,9 +528,11 @@ function onOperationalTriggersAndNoDataClick () {
             $("#features_field input[type='checkbox']").prop("disabled", false);
         } else {
             // TODO: Add logic about M2 being disabled on A3 onset of M
-            if (public_alert !== "A1" && public_alert !== "A0") {
-                if (public_alert === "A3") $big_m.prop("disabled", false);
-                $small_m.prop("disabled", false);
+            if ($(currentTarget).hasClass("cbox_trigger")) {
+                if (public_alert !== "A1" && public_alert !== "A0") {
+                    if (public_alert === "A3") $big_m.prop("disabled", false);
+                    $small_m.prop("disabled", false);
+                }
             }
 
             $("#features_div").slideUp();
@@ -618,16 +623,16 @@ function removeTriggersFromSameGroup (triggers) {
  *    input if Cbox_Trigger_ND is checked
  *
 *******************************************/
-function disableDivsOnNoDataClick (trigger) {
-    let trigger_letter = trigger.value[0];
+function onNoDataClick (nd_trigger) {
+    let trigger_letter = nd_trigger.value[0];
     let tech_info = null;
     let double = false;
     const public_alert = $("#public_alert_level").val();
 
     switch (trigger_letter) {
-        case "R": tech_info = "rain"; break;
-        case "g": tech_info = "ground"; double = true; break;
-        case "s": tech_info = "sensor"; double = true; break;
+        case "R": tech_info = "rainfall"; break;
+        case "g": tech_info = "surficial"; double = true; break;
+        case "s": tech_info = "subsurface"; double = true; break;
         case "m": tech_info = "manifestation"; double = true; break;
         default: break;
     }
@@ -635,20 +640,15 @@ function disableDivsOnNoDataClick (trigger) {
     trigger_letter = public_alert === "A3" ? trigger_letter.toUpperCase() : trigger_letter;
 
     let triggers_div_temp = `.cbox_trigger[value=${trigger_letter}]`;
-    if (public_alert === "A3" && trigger_letter.toUpperCase() !== "M") {
+    if (public_alert === "A3") {
         const copy_letter = trigger_letter === trigger_letter.toUpperCase()
             ? trigger_letter.toLowerCase() : trigger_letter.toUpperCase();
         triggers_div_temp += `, .cbox_trigger[value=${copy_letter}]`;
     }
 
     const $triggers_div = $(triggers_div_temp);
-    if (trigger.checked) {
+    if (nd_trigger.checked) {
         $triggers_div.prop("checked", false).prop("disabled", true);
-        if (trigger_letter.toUpperCase() === "M") {
-            // $triggers_div.parent().next().children("input")
-            // .prop("disabled", true)
-            // .val("");
-        }
 
         let $tech_info_div = null;
         if (double) $tech_info_div = $(`#trigger_${tech_info}_1_info, #trigger_${tech_info}_2_info`);
@@ -656,15 +656,14 @@ function disableDivsOnNoDataClick (trigger) {
         $tech_info_div.prop("disabled", true).val("");
     } else if (public_alert === "A1" && trigger_letter === "m") {
         $triggers_div.prop("disabled", true);
-    }
-    /* else {
+    } else {
         $triggers_div.prop("disabled", false);
-    }*/
+    }
 
     // Enable/Disable Rainfall Intermediate Threshold option (rx)
     // if R0 is checked
     if (trigger_letter === "R") {
-        if (trigger.checked) $(".cbox_trigger_rx").prop("checked", false).prop("disabled", true);
+        if (nd_trigger.checked) $(".cbox_trigger_rx").prop("checked", false).prop("disabled", true);
         else $(".cbox_trigger_rx").prop("disabled", false);
     }
 }
@@ -689,7 +688,7 @@ function onRxButtonClick () {
             $r_trigger_input.parent().next().children("input")
             .prop("disabled", true)
             .val("");
-            $("#trigger_rain_info").prop("disabled", true).val("");
+            $("#trigger_rainfall_info").prop("disabled", true).val("");
             rx_internal = internal.indexOf("R") > -1 ? internal.replace(/R/g, "Rx") : `${internal}rx`;
         } else {
             $(`${r_trigger_selector}, ${r0_selector}`).prop("checked", false).prop("disabled", false);
@@ -768,7 +767,7 @@ function initializeManifestationRelatedDOM () {
 
         $(`${name_list} li:not([data-value='new'])`).remove();
         if (feature_type !== "" && feature_type !== "none") {
-            const site_id = $("#site").val();
+            const site_id = $("subsurface").val();
             $.get(`/../../pubrelease/getFeatureNames/${site_id}/${feature_type}`, (data) => {
                 $(name_list).siblings("button").prop("disabled", false);
                 data.forEach(({ feature_name, feature_id }) => {
@@ -1142,7 +1141,7 @@ function initializeFormValidator () {
             public_alert_level: "required",
             timestamp_entry: "required",
             release_time: "required",
-            site: "required",
+            site_id: "required",
             reporter_2: "required",
             comments: {
                 required: {

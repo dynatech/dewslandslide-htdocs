@@ -73,13 +73,18 @@ function initializeSurficialMarkersButton () {
                 getPlotDataForSurficial(input)
                 .done((series) => {
                     console.log(series);
-                    createSurficialMarkersButton(series);
+                    // createSurficialMarkersButton(series);
 
                     $(`#${input.site_code}-surficial`).show();
                     plotSurficial(series, input);
                     $(target).data("loaded", true);
                     $loading_surficial.hide();
                     createSVG("surficial", input.site_code);
+                })
+                .then(() => getGroundMarkerAndMarkerId(input.site_code))
+                .then((series) => {
+                    console.log(series);
+                    createSurficialMarkersButton(series);
                 })
                 .catch((x) => {
                     showErrorModal(x, "surficial chart");
@@ -142,26 +147,34 @@ function getPlotDataForSurficial (args, isEOS = false) {
     return $.getJSON(url);
 }
 
-function createSurficialMarkersButton (series) {
-    const markers = ["Markers"];
-    series.forEach(({ name }) => {
-        markers.push(name);
-    });
+function getGroundMarkerAndMarkerId (site_code, isEOS = false) {
+    let url = `/../site_analysis/getGroundMarkerAndMarkerId/${site_code}`;
+    url = isEOS ? `/../../../../../..${url}` : url;
 
+    return $.getJSON(url);
+}
+
+function createSurficialMarkersButton (series) {
+    const markers = [];
+    markers.push(["Markers", ""]);
+    console.log(markers);
+    series.forEach(({ crack_id, marker_id }) => {
+        markers.push([crack_id, marker_id]);
+    });
+    console.log(markers);
     $(".surficial-markers").remove();
     $btn_group = $("#surficial-markers-btn-group");
-    markers.forEach((marker_id) => {
+    markers.forEach(([crack_id, marker_id]) => {
         let classes = "btn btn-primary btn-sm surficial-markers";
-        if (marker_id === "Markers") {
+        if (crack_id === "Markers") {
             classes = "btn btn-sm no-click surficial-markers";
         }
-
         $btn_group.append($("<button>", {
-            id: `marker_${marker_id.toLowerCase()}`,
+            id: `marker_${crack_id.toLowerCase()}`,
             type: "button",
             class: classes,
             value: marker_id,
-            text: marker_id,
+            text: crack_id,
             "data-loaded": false
         }));
     });
@@ -262,7 +275,9 @@ function plotMarkerTrendingAnalysis (trend_dataset, input) {
         } else if (dataset_name === "displacement_interpolation") {
             createMarkerInterpolationChart(series, input);
         } else if (dataset_name === "velocity_acceleration_time") {
-            createMarkerAccelerationVsTimeChart(series, input);
+            const index = series.findIndex(x => x.name === "Timestamps");
+            const timestamps = series.splice(index, 1);
+            createMarkerAccelerationVsTimeChart(series, timestamps[0].data, input);
         }
     });
 }
@@ -270,22 +285,27 @@ function plotMarkerTrendingAnalysis (trend_dataset, input) {
 function processDatasetForPlotting ({ dataset_name, dataset }) {
     if (dataset_name === "velocity_acceleration") {
         dataset.forEach(({ name }, index) => {
-            if (name === "Threshold Interval") {
+            if (name === "Trend Line") {
+                dataset[index] = {
+                    ...dataset[index],
+                    type: "spline"
+                };
+            } else if (name === "Threshold Interval") {
                 dataset[index] = {
                     ...dataset[index],
                     type: "arearange",
                     lineWidth: 0,
-                    fillOpacity: 0.4,
+                    fillOpacity: 0.5,
                     zIndex: 0,
-                    color: "#ffa500"
+                    color: "#FFEB32"
                 };
             } else if (name === "Last Data Point") {
                 dataset[index] = {
                     ...dataset[index],
                     marker: {
                         symbol: "asterisk",
-                        lineColor: "#f5dc26",
-                        lineWidth: 3
+                        lineColor: "#FFEB32",
+                        lineWidth: 4
                     }
                 };
             }
@@ -301,6 +321,8 @@ function processDatasetForPlotting ({ dataset_name, dataset }) {
     } else if (dataset_name === "velocity_acceleration_time") {
         dataset.forEach(({ name }, index) => {
             if (name === "Velocity") {
+                dataset[index].yAxis = 0;
+            } else if (name === "Acceleration") {
                 dataset[index].yAxis = 1;
             }
         });
@@ -313,7 +335,7 @@ function createMarkerAccelerationChart (data, input) {
     $(`#marker-${marker_name}-vel_v_accel`).highcharts({
         series: data,
         chart: {
-            type: "spline",
+            type: "line",
             zoomType: "x",
             panning: true,
             panKey: "shift",
@@ -422,7 +444,7 @@ function createMarkerInterpolationChart (data, input) {
     });
 }
 
-function createMarkerAccelerationVsTimeChart (data, input) {
+function createMarkerAccelerationVsTimeChart (data, timestamps, input) {
     const { site_code, marker_name, end_date } = input;
     $(`#marker-${marker_name}-vel_v_accel_v_time`).highcharts({
         series: data,
@@ -448,10 +470,16 @@ function createMarkerAccelerationVsTimeChart (data, input) {
             style: { fontSize: "13px" }
         },
         xAxis: {
+            categories: timestamps,
             type: "datetime",
             dateTimeLabelFormats: {
                 month: "%e. %b %Y",
                 year: "%b"
+            },
+            labels: {
+                formatter: function () {
+                    return moment(this.value).format("D MMM");
+                }
             },
             title: {
                 text: "<b>Time (Days)</b>"

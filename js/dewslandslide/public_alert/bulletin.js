@@ -104,17 +104,18 @@ function addOnsetMessageIfApplicable (release, release_id, obj) {
 
 function addMailRecipients (is_onset) {
     const $recipients = $("#recipients_span");
+    const recipients = [];
     if (window.location.hostname === "www.dewslandslide.com") {
-        const recipients = ["rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com"];
+        recipients.push("rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com");
 
         if (is_onset) {
             recipients.push("phivolcs-dynaslope@googlegroups.com", "phivolcs-senslope@googlegroups.com");
         }
-
-        recipients.forEach((x) => { $("#recipients").tagsinput("add", x); });
     } else if ($recipients.html().length === 0) {
+        recipients.push("dynaslope.mail@gmail.com");
         $recipients.append("<b style='background-color:yellow;'>TEST SERVER ONLY -- RUS & AGD NOT AUTOMATICALLY TAGGED AS RECIPIENTS FOR SAFEGUARD</b><br/>");
     }
+    recipients.forEach((x) => { $("#recipients").tagsinput("add", x); });
 }
 
 function renderPDF (id) {

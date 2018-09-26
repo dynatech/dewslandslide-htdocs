@@ -58,7 +58,7 @@ $(document).ready(() => {
         [event] = data;
     }, "json")
     .done((data) => {
-        const { lat, lon, name } = event;
+        const { lat, lon, site_code: name } = event;
         latitude = lat;
         longitude = lon;
         site_code = name.toUpperCase();
