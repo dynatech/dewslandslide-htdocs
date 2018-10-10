@@ -931,38 +931,40 @@ function initializeConfirmEWITemplateViaChatterbox() {
             } else {
                 rain_info_template = `3 day cumulative rainfall as of ${$("#rfi-date-picker input").val()}: `;
             }
-      //       $.ajax({
-      //           url: "/api/rainfallScanner",
-      //           dataType: "json",
-      //           success (result) {
-	    	// var data = JSON.parse(result);
-	    	// for (var counter = 0; counter < samar_sites.length; counter++) {
-	    	// 	for (var sub_counter = 0; sub_counter < data.length; sub_counter++) {
-	    	// 		if (data[sub_counter].site == samar_sites[counter]) {
-	    	// 		if ($("#rainfall-cummulative").val() == "1d") {
-    		// 			rainfall_percent = parseInt((data[sub_counter]["1D cml"] / data[sub_counter]["half of 2yr max"]) * 100);
-	    	// 			} else {
-	    	// 				rainfall_percent = parseInt((data[sub_counter]["3D cml"] / data[sub_counter]["2yr max"]) * 100);
-	    	// 			}
-	    	// 			rain_info_template = `${rain_info_template} ${data[sub_counter].site} = ${rainfall_percent}%,\n`;
-	    	// 		}
-	    	// 	}
-	    	// }
+            $.ajax({
+                url: "http://dewsl-beta.com/rainfall_scanner/getrainfallPercentages",
+                dataType: "json",
+                success (result) {
+		    	var data = JSON.parse(result);
+		    	console.log(data);
+		    	// for (var counter = 0; counter < samar_sites.length; counter++) {
+		    	// 	for (var sub_counter = 0; sub_counter < data.length; sub_counter++) {
+		    	// 		if (data[sub_counter].site == samar_sites[counter]) {
+		    	// 		if ($("#rainfall-cummulative").val() == "1d") {
+	    		// 			rainfall_percent = parseInt((data[sub_counter]["1D cml"] / data[sub_counter]["half of 2yr max"]) * 100);
+		    	// 			} else {
+		    	// 				rainfall_percent = parseInt((data[sub_counter]["3D cml"] / data[sub_counter]["2yr max"]) * 100);
+		    	// 			}
+		    	// 			rain_info_template = `${rain_info_template} ${data[sub_counter].site} = ${rainfall_percent}%,\n`;
+		    	// 		}
+		    	// 	}
+		    	// }
 
-	  //   	for (var counter = 0; counter < samar_sites.length; counter++) {
-   //              $.post("../chatterbox/getsitbangprovmun", { sites: samar_sites[counter] })
-   //              .done((response) => {
-   //                  var data = JSON.parse(response);
-   //                  console.log(data);
-   //                  var sbmp = `${data[0].sitio}, ${data[0].barangay}, ${data[0].municipality}`;
-   //                  var formatSbmp = sbmp.replace("null", "");
-   //                  if (formatSbmp.charAt(0) == ",") {
-   //                      formatSbmp = formatSbmp.substr(1);
-   //                  }
-   //                  rain_info_template = rain_info_template.replace(data[0].name, formatSbmp);
-   //                  $("#msg").val(rain_info_template);
-   //              });
-			// }
+			  //   	for (var counter = 0; counter < samar_sites.length; counter++) {
+		   //              $.post("../chatterbox/getsitbangprovmun", { sites: samar_sites[counter] })
+		   //              .done((response) => {
+		   //                  var data = JSON.parse(response);
+		   //                  console.log(data);
+		   //                  var sbmp = `${data[0].sitio}, ${data[0].barangay}, ${data[0].municipality}`;
+		   //                  var formatSbmp = sbmp.replace("null", "");
+		   //                  if (formatSbmp.charAt(0) == ",") {
+		   //                      formatSbmp = formatSbmp.substr(1);
+		   //                  }
+		   //                  rain_info_template = rain_info_template.replace(data[0].name, formatSbmp);
+		   //                  $("#msg").val(rain_info_template);
+		   //              });
+					// });
+		        }});
 	    } else if ($("#ewi-date-picker input").val() == "" || $("#sites").val() == "") {
             alert("Invalid input, All fields must be filled");
         } else {

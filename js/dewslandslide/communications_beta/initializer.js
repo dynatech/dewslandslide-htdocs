@@ -794,6 +794,11 @@ function initializeDatepickers() {
         locale: "en",
         format: "YYYY-MM-DD HH:mm:ss"
     });
+
+    $("#rfi-date-picker").datetimepicker({
+        locale: "en",
+        format: "hh:mmA MMMM DD, YYYY"
+    });
 }
 
 function initializeMiscButtons() {
