@@ -13,6 +13,7 @@ let release_id = null;
 let event_id = null;
 let original_field_values = [];
 let bulletin_timestamp = null;
+const HOSTNAME = window.location.hostname;
 
 $(document).ready(() => {
     reposition("#bulletinLoadingModal");
@@ -103,18 +104,21 @@ function addOnsetMessageIfApplicable (release, release_id, obj) {
 }
 
 function addMailRecipients (is_onset) {
-    const $recipients = $("#recipients_span");
+    const $rec_span = $("#recipients_span");
     const recipients = [];
-    if (window.location.hostname === "www.dewslandslide.com") {
+
+    if (HOSTNAME.includes("dynaslope.phivolcs.dost")) {
         recipients.push("rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com");
 
         if (is_onset) {
             recipients.push("phivolcs-dynaslope@googlegroups.com", "phivolcs-senslope@googlegroups.com");
         }
-    } else if ($recipients.html().length === 0) {
+    } else if ($rec_span.html().length === 0) {
         recipients.push("dynaslope.mail@gmail.com");
-        $recipients.append("<b style='background-color:yellow;'>TEST SERVER ONLY -- RUS & AGD NOT AUTOMATICALLY TAGGED AS RECIPIENTS FOR SAFEGUARD</b><br/>");
+        $rec_span.append("<b style='background-color:yellow;'>TEST SERVER ONLY -- RUS & AGD NOT AUTOMATICALLY TAGGED AS RECIPIENTS FOR SAFEGUARD</b><br/>");
     }
+
+    $("#recipients").tagsinput("removeAll");
     recipients.forEach((x) => { $("#recipients").tagsinput("add", x); });
 }
 
@@ -219,11 +223,14 @@ function tagBulletin (release_id, edited_field_values, original_field_values) {
 function sendMail (text, subject, filename, recipients) {
     $("#bulletinLoadingModal .progress-bar").text("Sending EWI and Bulletin...");
 
+    const is_test = HOSTNAME.includes("dynaslope.phivolcs.dost") ? false : true;
+
     const form = {
         text,
         subject,
         filename,
-        recipients
+        recipients,
+        is_test
     };
 
     console.log(text, subject, filename);

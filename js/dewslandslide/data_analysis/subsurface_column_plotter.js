@@ -24,7 +24,7 @@ function processSubsurfaceColumnDropDown (site_code) {
 }
 
 function getSiteSubsurfaceColumns (site_code) {
-    return $.getJSON(`../subsurface_column/getSiteSubsurfaceColumns/${site_code}`);
+    return $.getJSON(`../../subsurface_column/getSiteSubsurfaceColumns/${site_code}`);
 }
 
 function delegateSubsurfaceColumnsOnDropDown (column_list) {

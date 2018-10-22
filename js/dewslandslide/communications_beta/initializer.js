@@ -1,6 +1,7 @@
 let recipient_container = [];
 let recent_contacts_collection = [];
 let recent_sites_collection = [];
+let samar_sites_details = [];
 $(document).ready(function() {
 	$('#chatterbox-loader-modal').modal({backdrop: 'static', keyboard: false});
 	// $('#ground-meas-reminder-modal').modal({backdrop: 'static', keyboard: false});
@@ -40,6 +41,7 @@ function initialize() {
                 getOrganizationSelection();
                 initializeMiscButtons();
                 getQuickGroupSelection();
+                initializeSamarSites();
                 $("#chatterbox-loader-modal").modal("hide");
             } catch (err) {
                 $("#chatterbox-loader-modal").modal("hide");
@@ -72,7 +74,9 @@ function getContactSuggestion (name_suggestion) {
 	let contact_suggestion_container = [];
 
 	name_suggestion.data.forEach(function(raw_names) {
-		contact_suggestion_container.push(raw_names.fullname);
+        let mobile_number = raw_names.number.replace("63", "0");
+        let display_info = `${raw_names.fullname} (${mobile_number})`;
+		contact_suggestion_container.push(display_info);
 	});
 	awesomplete.list = contact_suggestion_container;
     initializeGoChatOnClick(awesomplete);
@@ -196,7 +200,10 @@ function getQuickInboxEvent() {
 }
 
 function getQuickInboxUnregistered() {
-
+    let msg = {
+        type: 'smsloadquickunknowninbox'
+    }
+    wss_connect.send(JSON.stringify(msg));
 }
 
 function getQuickInboxDataLogger() {
@@ -791,6 +798,11 @@ function initializeDatepickers() {
         locale: "en",
         format: "YYYY-MM-DD HH:mm:ss"
     });
+
+    $("#rfi-date-picker").datetimepicker({
+        locale: "en",
+        format: "hh:mmA MMMM DD, YYYY"
+    });
 }
 
 function initializeMiscButtons() {
@@ -812,4 +824,11 @@ function initializeMiscButtons() {
     $("#uncheckAllSitenames").click(() => {
         $("#modal-select-sitenames").find(".checkbox").find("input").prop("checked", false);
     });
+}
+
+function initializeSamarSites() {
+    let msg = {
+        type: "getSiteDetails"
+    };
+    wss_connect.send(JSON.stringify(msg));
 }

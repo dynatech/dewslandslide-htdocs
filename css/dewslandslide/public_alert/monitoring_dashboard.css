@@ -217,3 +217,7 @@ h3.popover-title { font-weight: bold; font-size: 16px!important; background: #C0
 	color: rgba(255,0,0,0.8);
 	background-color: rgba(255,0,0,0.5);
 }
+
+#invalid-alerts-group .alert {
+	margin-bottom: 5px;
+}

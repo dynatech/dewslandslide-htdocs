@@ -41,6 +41,7 @@ $(document).ready(function() {
 	loadSiteConvoViaQacess();
 	initializeOnClickAddMobileForEmployee();
 	initializeOnClickAddMobileForCommunity();
+	initializeOnClickUnregistered();
 });
 
 function initializeOnClickSendRoutine () {
@@ -75,13 +76,17 @@ function getRoutineMobileIDs(offices, sites_on_routine) {
 function sendRoutineSMSToLEWC(raw) { // To be refactored to accomodate custom routine message per site
 	let message = $("#routine-msg").val();
 	let sender = " - " + $("#user_name").html() + " from PHIVOLCS-DYNASLOPE";
+	console.log("hereSend");
 	raw.data.forEach(function(contact) {
 		raw.sites.forEach(function(site) {
+			console.log(site);
 			if (contact.fk_site_id == site.site_id) {
 				let temp = "";
 				if (site.purok == null && site.sitio == null) {
 					temp = site.barangay+", "+site.municipality+", "+site.province;
-				} else if (site.purok == null && site.sitio != null) {
+				} else if (site.purok == "" && site.sitio == "") {
+					temp = site.barangay+", "+site.municipality+", "+site.province; 
+				}else if (site.purok == null && site.sitio != null) {
 					temp = site.sitio+", "+site.barangay+", "+site.municipality+", "+site.province;
 				} else if (site.purok != null && site.sitio == null) {
 					temp = site.purok+", "+site.barangay+", "+site.municipality+", "+site.province;
@@ -93,7 +98,7 @@ function sendRoutineSMSToLEWC(raw) { // To be refactored to accomodate custom ro
 				message = message.replace("(current_date)", raw.date);
 				message = message.replace("(greetings)", "umaga");
 				message = message.replace("(gndmeas_time_submission)","bago-mag 11:30 AM");
-
+				// console.log(message);
 				try {
 					let convo_details = {
 						type: 'sendSmsToRecipients',
@@ -303,6 +308,23 @@ function initializeOnClickEventInbox () {
 		}
 
 		conversation_details_label = site+" "+office+" - "+firstname+" "+lastname;
+		startConversation(conversation_details);
+	});
+}
+
+function initializeOnClickUnregistered() {
+	$("body").on("click","#quick-unregistered-inbox-display li",function(){
+		let raw_name = $(this).closest('li').find("input[type='text']").val().split(",");
+		let firstname = raw_name[1].trim();
+		let lastname = raw_name[0].trim();
+		let conversation_details = {
+			full_name: $(this).closest('li').find("input[type='text']").val(),
+			firstname: firstname,
+			lastname: lastname,
+			number: "N/A"
+		}
+
+		conversation_details_label = firstname+" "+lastname;
 		startConversation(conversation_details);
 	});
 }
@@ -923,47 +945,44 @@ function initializeClearQuickSearchInputs () {
 
 function initializeConfirmEWITemplateViaChatterbox() {
 	$("#confirm-ewi").click(() => {
-        var samar_sites = ["jor", "bar", "ime", "lpa", "hin", "lte", "par", "lay"];
+        let samar_sites = ["jor", "bar", "ime", "lpa", "hin", "lte", "par", "lay"];
         if ($("#rainfall-sites").val() !== "#") {
-            var rain_info_template = "";
+            let rain_info_template = "";
             if ($("#rainfall-cummulative").val() == "1d") {
                 rain_info_template = `1 day cumulative rainfall as of ${$("#rfi-date-picker input").val()}: `;
             } else {
                 rain_info_template = `3 day cumulative rainfall as of ${$("#rfi-date-picker input").val()}: `;
             }
-      //       $.ajax({
-      //           url: "/api/rainfallScanner",
-      //           dataType: "json",
-      //           success (result) {
-	    	// var data = JSON.parse(result);
-	    	// for (var counter = 0; counter < samar_sites.length; counter++) {
-	    	// 	for (var sub_counter = 0; sub_counter < data.length; sub_counter++) {
-	    	// 		if (data[sub_counter].site == samar_sites[counter]) {
-	    	// 		if ($("#rainfall-cummulative").val() == "1d") {
-    		// 			rainfall_percent = parseInt((data[sub_counter]["1D cml"] / data[sub_counter]["half of 2yr max"]) * 100);
-	    	// 			} else {
-	    	// 				rainfall_percent = parseInt((data[sub_counter]["3D cml"] / data[sub_counter]["2yr max"]) * 100);
-	    	// 			}
-	    	// 			rain_info_template = `${rain_info_template} ${data[sub_counter].site} = ${rainfall_percent}%,\n`;
-	    	// 		}
-	    	// 	}
-	    	// }
-
-	  //   	for (var counter = 0; counter < samar_sites.length; counter++) {
-   //              $.post("../chatterbox/getsitbangprovmun", { sites: samar_sites[counter] })
-   //              .done((response) => {
-   //                  var data = JSON.parse(response);
-   //                  console.log(data);
-   //                  var sbmp = `${data[0].sitio}, ${data[0].barangay}, ${data[0].municipality}`;
-   //                  var formatSbmp = sbmp.replace("null", "");
-   //                  if (formatSbmp.charAt(0) == ",") {
-   //                      formatSbmp = formatSbmp.substr(1);
-   //                  }
-   //                  rain_info_template = rain_info_template.replace(data[0].name, formatSbmp);
-   //                  $("#msg").val(rain_info_template);
-   //              });
-			// }
-	    } else if ($("#ewi-date-picker input").val() == "" || $("#sites").val() == "") {
+            $.ajax({
+                url: "../rainfall_scanner/getRainfallPercentages",
+                dataType: "json",
+                success (result) {
+		    	let data = JSON.parse(result);
+		    	for (let counter = 0; counter < samar_sites.length; counter++) {
+		    	 	for (let sub_counter = 0; sub_counter < data.length; sub_counter++) {
+		    	 		if (data[sub_counter].site_code == samar_sites[counter]) {
+		    	 			if ($("#rainfall-cummulative").val() == "1d") {
+	    		 				rainfall_percent = parseInt((data[sub_counter]["1D cml"] / data[sub_counter]["half of 2yr max"]) * 100);
+		    	 			} else {
+		    	 				rainfall_percent = parseInt((data[sub_counter]["3D cml"] / data[sub_counter]["2yr max"]) * 100);
+		    	 			}
+		    	 			rain_info_template = `${rain_info_template} ${data[sub_counter].site_code} = ${rainfall_percent}%,\n`;
+		    	 		}
+		    	 	}
+		    	 }
+		        
+			for (let counter = 0; counter < samar_sites_details.length; counter++ ) {
+                		let sbmp = `${samar_sites_details[counter].sitio}, ${samar_sites_details[counter].barangay}, ${samar_sites_details[counter].municipality}`;
+                		let formatSbmp = sbmp.replace("null", "");
+                		if (formatSbmp.charAt(0) == ",") {
+                	    		formatSbmp = formatSbmp.substr(1);
+                		}
+                		rain_info_template = rain_info_template.replace(samar_sites_details[counter].site_code, formatSbmp);
+            		}
+			$("#msg").val(rain_info_template);
+		}
+		});
+	} else if ($("#ewi-date-picker input").val() == "" || $("#sites").val() == "") {
             alert("Invalid input, All fields must be filled");
         } else {
         	let template_container = {
@@ -1016,6 +1035,7 @@ function initializeEmployeeContactGroupSending() {
 
 function initializeSemiAutomatedGroundMeasurementReminder() {
     $("#btn-automation-settings").on("click",function() {
+    	$("#gnd-meas-category").val("event");
         let special_case_length = $(".special-case-template").length;
         special_case_num = 0;
         for (let counter = special_case_length-1; counter >=0; counter--) {
@@ -1040,6 +1060,7 @@ function initializeGndMeasSaveButton() {
         let special_case_length = $(".special-case-template").length-1;
         let gnd_sitenames = [];
         let special_case_sites = [];
+        let time_of_sending = ground_meas_reminder_data.time_of_sending;
         if (gnd_meas_overwrite == "new") {
             $("input[name=\"gnd-sitenames\"]:checked").each(function () {
                 gnd_sitenames.push(this.value);
@@ -1047,29 +1068,19 @@ function initializeGndMeasSaveButton() {
             if (gnd_sitenames.length == 0) {
             	$.notify('Please check at least one site','error');
             } else if(gnd_sitenames.length > 0){
-        		let gnd_meas_settings = {
-	                type: "setGndMeasReminderSettings",
-	                sites: gnd_sitenames,
-	                altered: 0,
-	                category: $("#gnd-meas-category").val(),
-	                template: $("#reminder-message").val(),
-	                overwrite: false,
-	                modified: first_name
-	            };
-	            // The special cases will replace default reminder message if checked.
-	            wss_connect.send(JSON.stringify(gnd_meas_settings));
-            	$.notify('Ground measurement settings saved!','success');
-
+        		
+            	gnd_sitenames = [];
             	if (special_case_length > 0) {
             		for (let counter = 0; counter < special_case_length; counter++) {
 	                    special_case_sites = [];
 	                    $("input[name=\"gnd-meas-"+counter+"\"]:checked").each(function () {
 	                        special_case_sites.push(this.value);
+	                        $(".gndmeas-reminder-site-container .gndmeas-reminder-site .checkbox label").find("input[value="+this.value+"]").prop("checked", false);
 	                    });
-	                    console.log(special_case_sites);
 
-			            let gnd_meas_settings = {
+			            let special_case_settings = {
 	                        type: "setGndMeasReminderSettings",
+	                        send_time: time_of_sending,
 	                        sites: special_case_sites,
 	                        category: $("#gnd-meas-category").val(),
 	                        altered: 1,
@@ -1077,17 +1088,31 @@ function initializeGndMeasSaveButton() {
 	                        overwrite: false,
 	                        modified: first_name
 	                    };
-	                    console.log(gnd_meas_settings);
+                    	wss_connect.send(JSON.stringify(special_case_settings));
 		            }
-                    wss_connect.send(JSON.stringify(gnd_meas_settings));              
-	                
 	            	$.notify('Ground measurement settings saved for special case!','success');
-            	} 
+            	}
+            	$("input[name=\"gnd-sitenames\"]:checked").each(function () {
+	                gnd_sitenames.push(this.value);
+	            });
+
+            	let gnd_meas_settings = {
+	                type: "setGndMeasReminderSettings",
+	                send_time: time_of_sending,
+	                sites: gnd_sitenames,
+	                altered: 0,
+	                category: $("#gnd-meas-category").val(),
+	                template: $("#reminder-message").val(),
+	                overwrite: false,
+	                modified: first_name
+	            };
+	            wss_connect.send(JSON.stringify(gnd_meas_settings));
+            	$.notify('Ground measurement settings saved!','success');
           
             }
-            
+            $(".special-case-site-container .gndmeas-reminder-site .checkbox label").closest("input").text();
         } else {
-            if (confirm('You have a save template, are you sure you want to overwrite it?')){
+        	let all_settings = ground_meas_reminder_data.settings
                 $("input[name=\"gnd-sitenames\"]:checked").each(function () {
                     gnd_sitenames.push(this.value);
                 });
@@ -1097,14 +1122,16 @@ function initializeGndMeasSaveButton() {
 
 	                let gnd_meas_settings = {
 	                    type: "setGndMeasReminderSettings",
+	                    send_time: time_of_sending,
 	                    sites: gnd_sitenames,
+	                    altered: 0,
 	                    category: $("#gnd-meas-category").val(),
 	                    template: $("#reminder-message").text(),
 	                    overwrite: true,
 	                    modified: first_name
 	                };
 
-	                wss_connect.send(JSON.stringify(gnd_meas_settings));
+	                // wss_connect.send(JSON.stringify(gnd_meas_settings));
 
 	                if (special_case_length > 0) {
 	                    for (let counter = 0; counter < special_case_length.length; counter++) {
@@ -1115,6 +1142,7 @@ function initializeGndMeasSaveButton() {
 
 	                        let gnd_meas_settings = {
 	                            type: "setGndMeasReminderSettings",
+	                            send_time: time_of_sending,
 	                            sites: gnd_sitenames,
 	                            altered: 1,
 	                            category: $("#gnd-meas-category").val(),
@@ -1122,16 +1150,23 @@ function initializeGndMeasSaveButton() {
 	                            overwrite: true,
 	                            modified: first_name
 	                        };
-	                        wss_connect.send(JSON.stringify(gnd_meas_settings));              
+	                        // wss_connect.send(JSON.stringify(gnd_meas_settings));              
 	                    }
 	                	$.notify('Ground measurement settings saved!','success');
 		            } else {
-		            	$.notify('Please check at least on site on special cases','error');
+		            	// $.notify('Please check at least on site on special cases','error');
 		            }
 	            }
-            }      
-        }
+            }  
     });
+}
+
+function displayGndMeasSavingStatus(status) {
+	if(status == true){
+		$("#ground-meas-reminder-modal").modal("hide");
+	}else {
+		$.notify('Something went wrong. Please try again','error');
+	}
 }
 
 function initializeResetSpecialCasesButtonOnCLick () {

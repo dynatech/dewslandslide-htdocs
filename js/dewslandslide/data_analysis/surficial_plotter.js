@@ -230,7 +230,7 @@ function createSurficialChart (data, input) {
             }
         },
         tooltip: {
-            split: true,
+            shared: true,
             crosshairs: true
         },
         plotOptions: {

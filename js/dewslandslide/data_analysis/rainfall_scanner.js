@@ -99,13 +99,16 @@ function processRainfallData (result) {
         const bool = evaluateSiteRainfall(operand, cummulative_data, compare_var);
 
         if (bool) {
+            const site = `<a href="../../analysis/site_analysis/${site_code}" target="_blank"><b>${site_code.toUpperCase()}</b> <i class="fa fa-link"></i> </a>`;
             const cum_1d = {
                 y: (cumulative_1d / threshold_1d) * 100,
-                data_value: `- Cumulative Data: <b>${cumulative_1d} mm</b><br>- Threshold: <b>${threshold_1d} mm</b>`
+                data_value: `- Cumulative Data: <b>${cumulative_1d} mm</b><br>- Threshold: <b>${threshold_1d} mm</b>`,
+                site
             };
             const cum_3d = {
                 y: (cumulative_3d / threshold_3d) * 100,
-                data_value: `- Cumulative Data: <b>${cumulative_3d} mm</b><br>- Threshold: <b>${threshold_3d} mm</b>`
+                data_value: `- Cumulative Data: <b>${cumulative_3d} mm</b><br>- Threshold: <b>${threshold_3d} mm</b>`,
+                site
             };
 
             filtered.site_codes.push(site_code.toUpperCase());
@@ -129,8 +132,7 @@ function getRainfallPercentages () {
             module_name: "Rainfall Scanner",
             report_message: `error on getting Rainfall Percentages ${responseText}`
         };
-
-        PMS.send(report);     
+        PMS.send(report);
     });
 }
 
@@ -224,10 +226,16 @@ function createRainfallPercentagesPlot (data) {
             shadow: false
         },
         tooltip: {
+            hideDelay: 3000,
+            useHTML: true,
+            style: {
+                pointerEvents: "auto"
+            },
             formatter () {
                 const num = this.series.name.charAt(0);
                 const percentage = this.point.y;
-                let str = `<b>${num}-Day</b><br/>- Percentage: <b>${percentage.toFixed(2)}%</b><br/>`;
+                const site_link = this.point.site;
+                let str = `${site_link} (<b>${num}-Day)</b><br/>- Percentage: <b>${percentage.toFixed(2)}%</b><br/>`;
                 str += this.point.data_value;
                 return str;
             }

@@ -2,6 +2,7 @@ let ewi_event_id = null;
 let ewi_site_id = null;
 let ewi_timestamp = null;
 let ewi_data_timestamp = null;
+let ewi_event_start = null;
 let temp_ewi_button_container = null;
 $(document).ready(() => {
 	let temp_ewi_template_holder = "";
@@ -20,9 +21,12 @@ function initializeEwiPhoneButton() {
         temp_ewi_button_container = $(currentTarget).attr('id');
         current_row = latest_table.row(i).data();
         current_row.formatted_data_timestamp =  moment(current_row.data_timestamp).add(30, "m").format('MMMM D, YYYY h:mm A');
+        current_row.formatted_data_timestamp = current_row.formatted_data_timestamp.replace("12:00 PM", "12:00 NN");
+        current_row.formatted_data_timestamp = current_row.formatted_data_timestamp.replace("12:00 AM", "12:00 MN");
         ewi_timestamp = moment(current_row.data_timestamp).add(30, "m").format('h:mm A');
         ewi_event_id = current_row.event_id;
         ewi_site_id = current_row.site_id;
+        ewi_event_start = current_row.event_start;
         ewi_data_timestamp = moment(current_row.data_timestamp).add(30, "m").format('YYYY-MM-DD H:mm:ss');
         let request = {
         	"type": "getEwiDetailsViaDashboard",
@@ -40,6 +44,8 @@ function initializeEwiPhoneExtendedButton() {
         current_row = extended_table.row(i).data();
         temp_ewi_button_container = $(currentTarget).attr('id');
         current_row.formatted_data_timestamp =  moment(current_row.data_timestamp).add(30, "m").format('MMMM D, YYYY');
+        current_row.formatted_data_timestamp = current_row.formatted_data_timestamp.replace("12:00 PM", "12:00 NN");
+        current_row.formatted_data_timestamp = current_row.formatted_data_timestamp.replace("12:00 AM", "12:00 MN");
         ewi_timestamp = moment(current_row.data_timestamp).add(30, "m").format('h:mm A');
         ewi_event_id = current_row.event_id;
         ewi_site_id = current_row.site_id;
@@ -98,6 +104,7 @@ function initializeSendButton() {
 			"site_id": ewi_site_id,
 			"timestamp": ewi_timestamp,
 			"data_timestamp":ewi_data_timestamp,
+            "event_start": ewi_event_start,
 			"previous_release_time": ewi_timestamp = moment(ewi_data_timestamp).subtract(240, "m").format('h:mm A'),
 			"recipients": $("#ewi-recipients-dashboard").tagsinput('items'),
 			"msg": $("#constructed-ewi-amd").val() + dashboard_sms_signature,

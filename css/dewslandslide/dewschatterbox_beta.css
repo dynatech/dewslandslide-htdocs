@@ -284,7 +284,7 @@ div.awesomplete > ul {
   padding: 3px 5px;
 }
 
-#quick-inbox-display,#quick-inbox-unknown-display,#quick-release-display,#quick-event-inbox-display,#group-message-display, #datalogger-inbox-display {
+#quick-inbox-display,#quick-unregistered-inbox-display,#quick-release-display,#quick-event-inbox-display,#group-message-display, #datalogger-inbox-display {
   height: 555px;
   overflow: hidden;
   overflow-y: scroll;

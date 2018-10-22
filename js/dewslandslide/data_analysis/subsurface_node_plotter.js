@@ -24,7 +24,7 @@ function processNodeDropDown (subsurface_column) {
 }
 
 function getSiteColumnNodeCount (subsurface_column) {
-    return $.getJSON(`../site_analysis/getSiteColumnNodeCount/${subsurface_column}`);
+    return $.getJSON(`../../site_analysis/getSiteColumnNodeCount/${subsurface_column}`);
 }
 
 function delegateNodeNumbersOnDropdown (node_count) {
@@ -95,7 +95,7 @@ function hideByDefaultRawSeries (series) {
 function getPlotDataForNode ({
     subsurface_column, start_date, end_date, node
 }) {
-    return $.getJSON(`../site_analysis/getPlotDataForNode/${subsurface_column}/${start_date}/${end_date}/${node}`);
+    return $.getJSON(`../../site_analysis/getPlotDataForNode/${subsurface_column}/${start_date}/${end_date}/${node}`);
 }
 
 function createGeneralNodeChart (series_name, data, input, source_name) {

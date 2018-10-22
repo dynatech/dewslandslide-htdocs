@@ -121,7 +121,7 @@ function plotRainfallCharts (site_code) {
 }
 
 function getRainDataSourcesPerSite (site_code) {
-    return $.getJSON(`../rainfall/getRainDataSourcesPerSite/${site_code}`);
+    return $.getJSON(`../../rainfall/getRainDataSourcesPerSite/${site_code}`);
 }
 
 function createRainSourcesButton (sources) {

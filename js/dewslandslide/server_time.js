@@ -3,7 +3,7 @@ $(document).ready(function(){
 });
 
 function updateClock() {
-	$.get( "../utilities/getServerTime", function( data ) {
+	$.get( "../../../utilities/getServerTime", function( data ) {
 		var time = JSON.parse(data);
 		$('#server-time').text(time);
 	});

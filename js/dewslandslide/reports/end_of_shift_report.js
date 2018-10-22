@@ -6,6 +6,7 @@
  *  [host]/reports/accomplishment/form
 ****/
 
+const HOSTNAME = window.location.hostname;
 const current_user_id = $("#current_user_id").attr("value");
 let releases_per_event,
     shift_timestamps,
@@ -339,7 +340,7 @@ function initializeMailRecipients () {
     $("#mail_recipients_row .bootstrap-tagsinput").css("width", "100%");
     const $recipients = $("#recipients_span");
     const emails = [];
-    if (window.location.hostname === "www.dewslandslide.com") {
+    if (HOSTNAME.includes("dynaslope.phivolcs.dost.gov.ph")) {
         emails.push("rusolidum@phivolcs.dost.gov.ph", "asdaag48@gmail.com", "phivolcs-senslope@googlegroups.com", "phivolcs-dynaslope@googlegroups.com");
     } else if ($recipients.html().length === 0) {
         emails.push("dynaslope.mail@gmail.com");
@@ -944,10 +945,12 @@ function sendReport (site_code, event_id) {
     const recipients = $("#recipients").tagsinput("items");
     const form_data = new FormData();
     const file_data = typeof upload_files[site_code] !== "undefined" ? upload_files[site_code] : [];
+    const is_test = (HOSTNAME.includes("dynaslope.phivolcs.dost.gov.ph")) ? false : true;
     const form = {
         event_id,
         site_code,
-        recipients: JSON.stringify(recipients)
+        recipients: JSON.stringify(recipients),
+        is_test
     };
 
     $(`#report_field_${site_code} textarea`).each((index, id) => {

@@ -8,7 +8,12 @@
  *  - Issues And Reminders Page
 ****/
 
-const wsUri = `ws://${window.location.hostname}:5070/`;
+const finalHostname = window.location.hostname.split(":");
+const wsUri = `ws://${finalHostname[0]}:5070`;
+
+console.log("WS Hostname");
+console.log(wsUri);
+
 let websocket;
 
 const reconnect = 10000;
@@ -91,6 +96,10 @@ function onMessage (evt) {
             buildDashboardTables(data);
         } else if (code === "existingAlerts") {
             buildDashboardTables(data);
+        } else if (code === "updateGeneratedAlerts") {
+            let { generated_alerts } = data;
+            generated_alerts = JSON.parse(generated_alerts);
+            processReceivedGeneratedAlerts(generated_alerts);
         } else if (code === "showAutomationMenu") {
             $("#automation-row").show();
             if (data.alert_release.switch) {
