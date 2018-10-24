@@ -78,20 +78,21 @@ function saveChangesOnDataTags(data){
 	let url = null;
 	let success_message = null;
 	if(BUTTON_TYPE == "insert"){
-		url = "../general_tagging/addNewGeneralDataTag";
+		url = "../general_data_tagging/add_gen_tag";
 		success_message = "Successfully added new tag.";
 	}else if(BUTTON_TYPE == "update"){
 		data.tag_id = $("#data_tag_id").val();
-		url = "../general_tagging/updateGeneralDataTag";
+		url = "../general_data_tagging/update_gen_tag";
 		success_message = "Successfully updated tag.";
 	}else {
 		data.tag_id = $("#data_tag_id").val();
-		url = "../general_tagging/deleteGeneralDataTag";
+		url = "../general_data_tagging/delete_gen_tag";
 		success_message = "Successfully deleted tag.";
 	}
 
 	$.post(url, {data_tags: data})
     .done((result, textStatus, jqXHR) => {
+    	console.log(result);
         if(result == "true"){
         	$.notify(success_message, "success");
 	        $("#add-data-tag-form").trigger('reset');
@@ -104,7 +105,13 @@ function saveChangesOnDataTags(data){
         }
     })
     .catch((x) => {
-    	// insert pms here
+    	console.log(x.responseText.indexOf("Duplicate entry"));
+    	if (x.responseText.indexOf("Duplicate entry")) {
+    		$.notify("Duplicate entry, Please try again.", "error");
+    	} else {
+    		// insert pms here
+    		$.notify("Something went wrong, Please try again.", "error");
+    	}
     })
     .always(() => {
     	//for closing loader modal
