@@ -867,12 +867,12 @@ function initializeMailIconOnClick () {
         const release_id = $(currentTarget).prop("id");
         const event_id = $(currentTarget).attr("data-event-id");
         loadBulletin(release_id, event_id);
-        $("#bulletinModal #send").data("release-id", release_id);
+        $("#bulletin-modal #send").data("release-id", release_id);
     });
 }
 
 function initializeSendBulletin () {
-    $("#bulletinModal #send").click(({ currentTarget }) => {
+    $("#bulletin-modal #send").click(({ currentTarget }) => {
         const release_id = parseInt($(currentTarget).data("release-id"), 10);
         $.when(renderPDF(release_id))
         .then((x) => {
