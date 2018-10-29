@@ -212,6 +212,7 @@ function saveGeneralTagging (button_type, data) {
 	let url = null;
 	let success_message = null;
 	data.data_tag = $("#data-tag").val();
+	data.user_id = $("#current_user_id").val();
 	if(button_type == "insert"){
 		url = "../general_data_tagging/insert_tag_point";
 		success_message = "Successfully added point(s).";
@@ -412,9 +413,10 @@ function enableSelectionOnSurficialChart () {
 
 function enableRainfallSelection(){
 	console.log(RAINFALL_DATA);
+	destroyCharts("#rainfall-plots .rainfall-chart");
+    $("#rainfall-plots .plot-container").remove();
 	RAINFALL_DATA.forEach((source) => {
         const { null_ranges, gauge_name } = source;
-
         createPlotContainer("rainfall", gauge_name);
 
         const series_data = [];
@@ -435,12 +437,13 @@ function enableRainfallSelection(){
         });
 
         const null_processed = null_ranges.map(({ from, to }) => ({ from, to, color: "rgba(68, 170, 213, 0.3)" }));
-        enableInstantaneousRainfallSelection(max_rval_data, RAINFALL_INPUT, source, null_processed);
+        enableInstantaneousRainfallSelection(max_rval_data, source, null_processed);
         enableCumulativeRainfallSelection(series_data, source);
     });
 }
 
-function enableCumulativeRainfallSelection(max_rval_data, source){
+function enableCumulativeRainfallSelection(series_data, source){
+	console.log(source);
 	const { site_code, start_date, end_date } = RAINFALL_INPUT;
     const {
         distance, max_72h, threshold_value: max_rain_2year, gauge_name
@@ -450,7 +453,7 @@ function enableCumulativeRainfallSelection(max_rval_data, source){
 
     Highcharts.setOptions({ global: { timezoneOffset: -8 * 60 } });
     $(container).highcharts({
-        series: RAINFALL_DATA,
+        series: series_data,
         chart: {
             type: "line",
             zoomType: "x",
@@ -548,7 +551,7 @@ function enableInstantaneousRainfallSelection(max_rval_data, source, null_proces
     const container = `#${gauge_name}-instantaneous`;
 
     $(container).highcharts({
-        series: RAINFALL_DATA,
+        series: max_rval_data,
         chart: {
             type: "column",
             zoomType: "x",
