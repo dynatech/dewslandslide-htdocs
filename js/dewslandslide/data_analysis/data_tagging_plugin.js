@@ -211,7 +211,7 @@ function enableDataTagging(){
 function saveGeneralTagging (button_type, data) {
 	let url = null;
 	let success_message = null;
-
+	data.data_tag = $("#data-tag").val();
 	if(button_type == "insert"){
 		url = "../general_data_tagging/insert_tag_point";
 		success_message = "Successfully added point(s).";
@@ -222,7 +222,7 @@ function saveGeneralTagging (button_type, data) {
 		url = "../general_data_tagging/remove_tag_point";
 		success_message = "Successfully deleted point(s).";
 	}
-
+	console.log(data);
 	$.post(url, data)
     .done((result, textStatus, jqXHR) => {
         if(result == "true"){
@@ -320,7 +320,6 @@ function selectedPoints(e) {
     	table: table_name,
     	data_start_id: Math.min.apply(Math, ids),
     	data_end_id: Math.max.apply(Math, ids)
-    	data_tag: $("#data-tag").val();
     };
 
     showSelectedData();
