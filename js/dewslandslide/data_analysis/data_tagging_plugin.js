@@ -1,5 +1,6 @@
 let DATA_TAGGING_ENABLED = false;
-let SURFICAL_DATA_POINT = null;
+let CHART_ENABLE = null;
+let DATA_POINT_SELECTED = null;
 $(document).ready(() => {
 	initializeDataTaggingButton();
 });
@@ -192,13 +193,16 @@ function initializeDataTaggingButton () {
 
 function enableDataTagging(){
 	$("#btn-enable-data-tagging").click(function(){
+		let selected = $("#charts-option").val().toLowerCase();
 		let button_text = $("#btn-enable-data-tagging").text();
+		console.log(selected);
 		if(button_text == "Enable"){
 			DATA_TAGGING_ENABLED = true;
 			enableSelectionOnSurficialChart();
 		}else {
 			DATA_TAGGING_ENABLED = false;
-			plotSurficialCharts();
+			destroyCharts("#surficial-plots .plot-container");
+			plotSurficial(SURFICIAL_DATA, SURFICIAL_INPUT);
 		}
 		$("#data-tagging-modal").modal("hide");
 	}); 
@@ -244,12 +248,12 @@ function showSelectedData(){
 	$("#data-tagging-modal").modal("show");
 	$("#btn-save-data-tag").show();
 	$("#btn-enable-data-tagging").hide();
-	$("#data_table").text(SURFICAL_DATA_POINT.table);
-	$("#data_start").text(SURFICAL_DATA_POINT.data_start_id);
-	$("#data_end").text(SURFICAL_DATA_POINT.data_end_id);
+	$("#data_table").text(DATA_POINT_SELECTED.table);
+	$("#data_start").text(DATA_POINT_SELECTED.data_start_id);
+	$("#data_end").text(DATA_POINT_SELECTED.data_end_id);
+	$("#data-tag-container").show();
 	$("#btn-save-data-tag").click(function(){
-		saveGeneralTagging("insert", SURFICAL_DATA_POINT);
-		// console.log(SURFICAL_DATA_POINT);
+		saveGeneralTagging("insert", DATA_POINT_SELECTED);
 	}); 
 }
 
@@ -297,17 +301,26 @@ function selectedPoints(e) {
     // console.log(e.points);
     const datas = e.points;
     let ids = [];
+    let selected = $("#charts-option").val().toLowerCase();
     datas.forEach((data) => {
-        let id = data.id;
-        if(ids.includes(id) !=  true){
-        	ids.push(id);
-        }
+    	console.log(data);
+        // let id = data.id;
+        // if(ids.includes(id) !=  true){
+        // 	ids.push(id);
+        // }
     });
-
-    SURFICAL_DATA_POINT = {
-    	table: "marker_observations",
+    let table_name = null;
+    if(selected == "surficial"){
+    	table_name = "marker_observations";
+    }else {
+    	table_name = "rain";
+    }
+    // console.log(table_name);
+    DATA_POINT_SELECTED = {
+    	table: table_name,
     	data_start_id: Math.min.apply(Math, ids),
     	data_end_id: Math.max.apply(Math, ids)
+    	data_tag: $("#data-tag").val();
     };
 
     showSelectedData();
@@ -391,6 +404,214 @@ function enableSelectionOnSurficialChart () {
                     }
                 }
             }
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+function enableRainfallSelection(){
+	console.log(RAINFALL_DATA);
+	RAINFALL_DATA.forEach((source) => {
+        const { null_ranges, gauge_name } = source;
+
+        createPlotContainer("rainfall", gauge_name);
+
+        const series_data = [];
+        const max_rval_data = [];
+        Object.keys(rainfall_colors).forEach((name) => {
+            const color = rainfall_colors[name];
+            const entry = {
+                name,
+                step: true,
+                data: source[name],
+                color,
+                id: name,
+                fillOpacity: 1,
+                lineWidth: 1
+            };
+            if (name !== "rain") series_data.push(entry);
+            else max_rval_data.push(entry);
+        });
+
+        const null_processed = null_ranges.map(({ from, to }) => ({ from, to, color: "rgba(68, 170, 213, 0.3)" }));
+        enableInstantaneousRainfallSelection(max_rval_data, RAINFALL_INPUT, source, null_processed);
+        enableCumulativeRainfallSelection(series_data, source);
+    });
+}
+
+function enableCumulativeRainfallSelection(max_rval_data, source){
+	const { site_code, start_date, end_date } = RAINFALL_INPUT;
+    const {
+        distance, max_72h, threshold_value: max_rain_2year, gauge_name
+    } = source;
+
+    const container = `#${gauge_name}-cumulative`;
+
+    Highcharts.setOptions({ global: { timezoneOffset: -8 * 60 } });
+    $(container).highcharts({
+        series: RAINFALL_DATA,
+        chart: {
+            type: "line",
+            zoomType: "x",
+            events: {
+                selection: selectPointsByDrag,
+                selectedpoints: selectedPoints,
+                click: unselectByClick
+            },
+            resetZoomButton: {
+                position: {
+                    x: 0,
+                    y: -30
+                }
+            }
+        },
+        title: {
+            text: `<b>Cumulative Rainfall Chart of ${site_code.toUpperCase()}</b>`,
+            style: { fontSize: "13px" },
+            margin: 20,
+            y: 16
+        },
+        subtitle: {
+            text: `Source: <b>${createRainPlotSubtitle(distance, gauge_name)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            style: { fontSize: "11px" }
+        },
+        xAxis: {
+            min: Date.parse(start_date),
+            max: Date.parse(end_date),
+            type: "datetime",
+            dateTimeLabelFormats: {
+                month: "%e %b %Y",
+                year: "%Y"
+            },
+            title: {
+                text: "<b>Date</b>"
+            },
+            events: {
+                setExtremes: syncExtremes
+            }
+        },
+        yAxis: {
+            title: {
+                text: "<b>Value (mm)</b>"
+            },
+            max: Math.max(0, (max_72h - parseFloat(max_rain_2year))) + parseFloat(max_rain_2year),
+            min: 0,
+            plotBands: [{
+                value: Math.round(parseFloat(max_rain_2year / 2) * 10) / 10,
+                color: rainfall_colors["24h"],
+                dashStyle: "shortdash",
+                width: 2,
+                zIndex: 0,
+                label: {
+                    text: `24-hr threshold (${max_rain_2year / 2})`
+
+                }
+            }, {
+                value: max_rain_2year,
+                color: rainfall_colors["72h"],
+                dashStyle: "shortdash",
+                width: 2,
+                zIndex: 0,
+                label: {
+                    text: `72-hr threshold (${max_rain_2year})`
+                }
+            }]
+        },
+        tooltip: {
+            shared: true,
+            crosshairs: true
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    radius: 3
+                },
+                cursor: "pointer"
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+function enableInstantaneousRainfallSelection(max_rval_data, source, null_processed){
+	const { site_code, start_date, end_date } = RAINFALL_INPUT;
+    const {
+        distance, max_rval, gauge_name
+    } = source;
+
+    const container = `#${gauge_name}-instantaneous`;
+
+    $(container).highcharts({
+        series: RAINFALL_DATA,
+        chart: {
+            type: "column",
+            zoomType: "x",
+           	events: {
+                selection: selectPointsByDrag,
+                selectedpoints: selectedPoints,
+                click: unselectByClick
+            },
+            resetZoomButton: {
+                position: {
+                    x: 0,
+                    y: -30
+                }
+            }
+        },
+        title: {
+            text: `<b>Instantaneous Rainfall Chart of ${site_code.toUpperCase()}</b>`,
+            style: { fontSize: "13px" },
+            margin: 20,
+            y: 16
+        },
+        subtitle: {
+            text: `Source : <b>${createRainPlotSubtitle(distance, gauge_name)}</b><br/>As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            style: { fontSize: "11px" }
+        },
+        xAxis: {
+            min: Date.parse(start_date),
+            max: Date.parse(end_date),
+            plotBands: null_processed,
+            type: "datetime",
+            dateTimeLabelFormats: {
+                month: "%e %b %Y",
+                year: "%Y"
+            },
+            title: {
+                text: "<b>Date</b>"
+            },
+            events: {
+                setExtremes: syncExtremes
+            }
+        },
+        yAxis: {
+            max: max_rval,
+            min: 0,
+            title: {
+                text: "<b>Value (mm)</b>"
+            }
+        },
+        tooltip: {
+            shared: true,
+            crosshairs: true
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    radius: 3
+                },
+                cursor: "pointer"
+            }
+        },
+        legend: {
+            enabled: false
         },
         credits: {
             enabled: false
