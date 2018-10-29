@@ -303,11 +303,11 @@ function selectedPoints(e) {
     let ids = [];
     let selected = $("#charts-option").val().toLowerCase();
     datas.forEach((data) => {
-    	console.log(data);
-        // let id = data.id;
-        // if(ids.includes(id) !=  true){
-        // 	ids.push(id);
-        // }
+    	// console.log(data);
+        let id = data.id;
+        if(ids.includes(id) !=  true){
+        	ids.push(id);
+        }
     });
     let table_name = null;
     if(selected == "surficial"){
