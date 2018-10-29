@@ -1,4 +1,5 @@
-
+let SURFICIAL_DATA = null;
+let SURFICIAL_INPUT = null;
 $(document).ready(() => {
     initializeSurficialMarkersButton();
     initializeSurficialDurationDropDownOnClick();
@@ -182,13 +183,15 @@ function createSurficialMarkersButton (series) {
 
 function plotSurficial (series, input) {
     const { site_code } = input;
+    SURFICIAL_DATA = series;
+    SURFICIAL_INPUT = input;
     createPlotContainer("surficial", `${site_code}-surficial`);
     createSurficialChart(series, input);
 }
 
 function createSurficialChart (data, input) {
     const { site_code, start_date, end_date } = input;
-
+    console.log(data);
     $(`#${site_code}-surficial`).highcharts({
         series: data,
         chart: {
@@ -256,6 +259,15 @@ function createSurficialChart (data, input) {
             enabled: false
         }
     });
+}
+
+function unselectByClickForSurficial() {
+    var points = this.getSelectedPoints();
+    if (points.length > 0) {
+        Highcharts.each(points, function (point) {
+            point.select(false);
+        });
+    }
 }
 
 function getPlotDataForMarkerAcceleration ({ site_code, marker_name, end_date }) {
@@ -522,3 +534,4 @@ function createMarkerAccelerationVsTimeChart (data, timestamps, input) {
         }
     });
 }
+

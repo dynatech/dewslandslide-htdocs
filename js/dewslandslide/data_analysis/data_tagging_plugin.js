@@ -204,7 +204,7 @@ function enableDataTagging(){
 	}); 
 }
 
-function saveGeneralTagging (button_type, id = null, data) {
+function saveGeneralTagging (button_type, data) {
 	let url = null;
 	let success_message = null;
 
@@ -248,8 +248,8 @@ function showSelectedData(){
 	$("#data_start").text(SURFICAL_DATA_POINT.data_start_id);
 	$("#data_end").text(SURFICAL_DATA_POINT.data_end_id);
 	$("#btn-save-data-tag").click(function(){
-		// saveGeneralTagging("insert", SURFICAL_DATA_POINT);
-		console.log(SURFICAL_DATA_POINT);
+		saveGeneralTagging("insert", SURFICAL_DATA_POINT);
+		// console.log(SURFICAL_DATA_POINT);
 	}); 
 }
 
