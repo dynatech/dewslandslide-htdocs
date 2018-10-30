@@ -155,6 +155,8 @@ function getPlotDataForRainfall (args, isEOS = false) {
 }
 
 function plotRainfall (datalist, temp) {
+    RAINFALL_DATA = datalist;
+    RAINFALL_INPUT = temp;
     datalist.forEach((source) => {
         const { null_ranges, gauge_name } = source;
 

@@ -198,11 +198,14 @@ function enableDataTagging(){
 		console.log(selected);
 		if(button_text == "Enable"){
 			DATA_TAGGING_ENABLED = true;
-			enableSelectionOnSurficialChart();
+			if(selected == "rainfall"){
+				enableRainfallSelection();
+			}else{
+				enableSelectionOnSurficialChart();
+			}
 		}else {
 			DATA_TAGGING_ENABLED = false;
-			destroyCharts("#surficial-plots .plot-container");
-			plotSurficial(SURFICIAL_DATA, SURFICIAL_INPUT);
+			$("#plot-site-level").trigger("click");
 		}
 		$("#data-tagging-modal").modal("hide");
 	}); 
@@ -301,28 +304,66 @@ function selectedPoints(e) {
     // Show a label
     // console.log(e.points);
     const datas = e.points;
-    let ids = [];
+    let tagged_data = [];
     let selected = $("#charts-option").val().toLowerCase();
-    datas.forEach((data) => {
-    	// console.log(data);
-        let id = data.id;
-        if(ids.includes(id) !=  true){
-        	ids.push(id);
-        }
-    });
     let table_name = null;
+    datas.forEach((data) => {
+    	console.log(data);
+    	if(selected == "rainfall"){
+    		let rain_source = null;
+    		try {
+			    rain_source = data.graphic.renderer.cacheKeys[1].toString().split(" ");
+			    console.log(data);
+			} catch (e) {
+			    if (e instanceof TypeError) {
+			        // for catching TypeError
+			    } else {
+			        // for catching TypeError
+			    }
+			}
+
+	    	if(table_name == null){
+	    		try {
+				    table_name = rain_source[2].toString().replace("<b>", "");
+				    console.log(data);
+				} catch (e) {
+				    if (e instanceof TypeError) {
+				        rain_source = data.series.graph.renderer.cacheKeys[1].toString().split(" ");
+				        table_name = rain_source[1].toString().replace("<b>", "");
+				    } else {
+				        // console.log("catching type errror");
+				    }
+				}
+	    	}
+	    	
+	    	let timestamp = new Date(data.x);
+	    	timestamp = moment(timestamp).format("YYYY-MM-DD HH:mm:ss");
+	    	if(tagged_data.includes(timestamp) !=  true){
+	        	tagged_data.push(timestamp);
+	        }
+    	}else{
+	        let id = data.id;
+	        if(tagged_data.includes(id) !=  true){
+	        	tagged_data.push(id);
+	        }
+    	}
+    });
+    console.log(tagged_data);
     if(selected == "surficial"){
     	table_name = "marker_observations";
-    }else {
-    	table_name = "rain";
+    	DATA_POINT_SELECTED = {
+	    	table: table_name,
+	    	data_start_id: Math.min.apply(Math, tagged_data),
+	    	data_end_id: Math.max.apply(Math, tagged_data)
+	    };
+    }else{
+    	DATA_POINT_SELECTED = {
+	    	table: table_name,
+	    	data_start_id: tagged_data[0],
+	    	data_end_id: tagged_data[tagged_data.length-1]
+	    };
     }
-    // console.log(table_name);
-    DATA_POINT_SELECTED = {
-    	table: table_name,
-    	data_start_id: Math.min.apply(Math, ids),
-    	data_end_id: Math.max.apply(Math, ids)
-    };
-
+    console.log(DATA_POINT_SELECTED);
     showSelectedData();
 
     toast(this, '<b>' + e.points.length + ' points selected.</b>' +
@@ -412,13 +453,15 @@ function enableSelectionOnSurficialChart () {
 }
 
 function enableRainfallSelection(){
-	console.log(RAINFALL_DATA);
-	destroyCharts("#rainfall-plots .rainfall-chart");
-    $("#rainfall-plots .plot-container").remove();
+	// destroyCharts("#rainfall-plots .rainfall-chart");
+ //    $("#rainfall-plots .plot-container").remove();
 	RAINFALL_DATA.forEach((source) => {
         const { null_ranges, gauge_name } = source;
-        createPlotContainer("rainfall", gauge_name);
 
+        const container_cumulative = $(`#${gauge_name}-cumulative`);
+        const container_instantaneous = $(`#${gauge_name}-instantaneous`);
+        container_cumulative.empty();
+        container_instantaneous.empty();
         const series_data = [];
         const max_rval_data = [];
         Object.keys(rainfall_colors).forEach((name) => {
@@ -437,25 +480,27 @@ function enableRainfallSelection(){
         });
 
         const null_processed = null_ranges.map(({ from, to }) => ({ from, to, color: "rgba(68, 170, 213, 0.3)" }));
-        enableInstantaneousRainfallSelection(max_rval_data, source, null_processed);
-        enableCumulativeRainfallSelection(series_data, source);
+        enableInstantaneousRainfallSelection(max_rval_data, RAINFALL_INPUT, source, null_processed);
+        enableCumulativeRainfallSelection(series_data, RAINFALL_INPUT, source);
     });
 }
 
-function enableCumulativeRainfallSelection(series_data, source){
-	const { site_code, start_date, end_date } = RAINFALL_INPUT;
+function enableCumulativeRainfallSelection(data, temp, source){
+	const { site_code, start_date, end_date } = temp;
     const {
         distance, max_72h, threshold_value: max_rain_2year, gauge_name
     } = source;
 
     const container = `#${gauge_name}-cumulative`;
-
+    console.log(container);
+    // $(container).highcharts().destroy();
     Highcharts.setOptions({ global: { timezoneOffset: -8 * 60 } });
     $(container).highcharts({
-        series: series_data,
+        series: data,
         chart: {
             type: "line",
             zoomType: "x",
+            height: 400,
             events: {
                 selection: selectPointsByDrag,
                 selectedpoints: selectedPoints,
@@ -541,19 +586,20 @@ function enableCumulativeRainfallSelection(series_data, source){
     });
 }
 
-function enableInstantaneousRainfallSelection(max_rval_data, source, null_processed){
-	const { site_code, start_date, end_date } = RAINFALL_INPUT;
+function enableInstantaneousRainfallSelection(data, temp, source, null_processed){
+	const { site_code, start_date, end_date } = temp;
     const {
         distance, max_rval, gauge_name
     } = source;
 
     const container = `#${gauge_name}-instantaneous`;
-
+    // $(container).highcharts().destroy();
     $(container).highcharts({
-        series: max_rval_data,
+        series: data,
         chart: {
             type: "column",
             zoomType: "x",
+            height: 400,
            	events: {
                 selection: selectPointsByDrag,
                 selectedpoints: selectedPoints,
