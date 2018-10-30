@@ -226,7 +226,7 @@ function saveGeneralTagging (button_type, data) {
 	console.log(data);
 	$.post(url, data)
     .done((result, textStatus, jqXHR) => {
-        if(result == "true"){
+        if(result == 1){
         	$.notify(success_message, "success");
         	$(".modal").modal("hide");
         }else {
@@ -443,7 +443,6 @@ function enableRainfallSelection(){
 }
 
 function enableCumulativeRainfallSelection(series_data, source){
-	console.log(source);
 	const { site_code, start_date, end_date } = RAINFALL_INPUT;
     const {
         distance, max_72h, threshold_value: max_rain_2year, gauge_name
