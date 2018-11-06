@@ -1,9 +1,23 @@
 let DATA_TAGGING_ENABLED = false;
 let CHART_ENABLE = null;
 let DATA_POINT_SELECTED = null;
+let OLD_TAGS = null;
 $(document).ready(() => {
 	initializeDataTaggingButton();
+	initalizeAllTags();
 });
+
+function initalizeAllTags(){
+	OLD_TAGS = null;
+	getAllDataTags()
+    .done((tags) => {
+        displayDataTags(tags);
+        OLD_TAGS = tags;
+    })
+    .catch((x) => {
+        showErrorModal(x, "data tag list");
+    });
+}
 
 function initializeDataTaggingButton () {
 	let timeOut;
@@ -177,6 +191,7 @@ function initializeDataTaggingButton () {
 		$("#charts-tagging-option").hide();
 		$("#btn-save-data-tag").hide();
 		$("#data-tagging-modal").modal("show");
+		$("#tag_selected").tagsinput('removeAll');
 		if(DATA_TAGGING_ENABLED == true){
 			$("#charts-tagging-option").hide();
 			$("#btn-enable-data-tagging").show();
@@ -215,7 +230,7 @@ function saveGeneralTagging (button_type, data) {
 	console.log(data);
 	let url = null;
 	let success_message = null;
-	data.data_tag = $("#data-tag").val();
+	data.data_tag = $("#tag_selected").tagsinput('items');
 	data.user_id = $("#current_user_id").val();
 	data.type = $("#charts-option").val().toLowerCase();
 	if(button_type == "insert"){
@@ -232,6 +247,7 @@ function saveGeneralTagging (button_type, data) {
 	$.post(url, data)
     .done((result, textStatus, jqXHR) => {
         if(result == 1){
+        	initalizeAllTags();
         	$.notify(success_message, "success");
         	$(".modal").modal("hide");
         }else {
@@ -259,6 +275,7 @@ function showSelectedData(){
 	$("#data_end").text(DATA_POINT_SELECTED.data_end_id);
 	$("#data-tag-container").show();
 	$("#btn-save-data-tag").click(function(){
+		// console.log(DATA_POINT_SELECTED);
 		saveGeneralTagging("insert", DATA_POINT_SELECTED);
 	}); 
 }
@@ -301,6 +318,21 @@ function toast(chart, text) {
     }, 2500);
 }
 
+function displayDataTags (data) {
+	$('#tag_selected').tagsinput({
+		typeahead: {
+			displayKey: 'text',
+			afterSelect: function (val) { this.$element.val(""); },
+			source: function (query) {
+				return data;
+			}
+		}
+	});
+}
+
+function getAllDataTags(){
+	return $.getJSON("../general_data_tagging/tags");
+}
 
 function selectedPoints(e) {
     // Show a label
@@ -310,7 +342,6 @@ function selectedPoints(e) {
     let selected = $("#charts-option").val().toLowerCase();
     let table_name = null;
     datas.forEach((data) => {
-    	console.log(data);
     	if(selected == "rainfall"){
     		let rain_source = null;
     		try {
