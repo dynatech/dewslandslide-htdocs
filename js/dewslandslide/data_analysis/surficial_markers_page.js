@@ -1,6 +1,7 @@
 
 let $MARKERS_NAV;
 let $MARKERS_MODAL;
+let $MARKERS_DATA_MODAL;
 let CURRENT_MARKER;
 let MODAL_FORM;
 let MODAL_FORM_ID;
@@ -10,15 +11,20 @@ $(document).ready(() => {
     $MARKERS_NAV = $("#markers-panel").find(".nav");
 
     reposition("#markers-modal");
+    reposition("#markers-data-modal");
     $MARKERS_MODAL = $("#markers-modal");
+    $MARKERS_DATA_MODAL = $("#markers-data-modal");
 
     MODAL_FORM_ID = "#markers-modal form";
 
+    initializeSurficialDurationDropDownOnClick();
     initializeSiteCodeOnChange();
     initializeMarkerTabOnClick();
     initializeMarkerInfoEditOnClick();
     MODAL_FORM = initializeMarkerModalForm(MODAL_FORM_ID);
     validateMarkerModalForm(MODAL_FORM_ID);
+
+    initializeMarkerDataPointOnClick();
 
     (() => {
         $("#site_code").val("agb").trigger("change");
@@ -152,7 +158,7 @@ function initializeMarkerModalForm (form_id) {
 }
 
 function validateMarkerModalForm (form_id) {
-    $(".submit-btn").on("click", ({ currentTarget }) => {
+    $(form_id).find(".submit-btn").on("click", ({ currentTarget }) => {
         MARKER_MODAL_SUBMIT = $(currentTarget).prop("id");
         $(form_id).valid();
     });
@@ -199,7 +205,7 @@ function initializeMarkerTabOnClick () {
 
         const args = {
             site_code: marker_id,
-            start_date: moment().subtract(1, "year").format("YYYY-MM-DD HH:mm:ss"),
+            start_date: getStartDate("surficial"),
             end_date: moment().format("YYYY-MM-DD HH:mm:ss"),
             marker_name,
             site_name: site_code
@@ -207,9 +213,28 @@ function initializeMarkerTabOnClick () {
 
         getPlotDataForSurficial(args)
         .done((data) => {
+            const plot_id = `${marker_name}-surficial`;
             destroyCharts("#surficial-plots .plot-container");
-            createPlotContainer("surficial", `${marker_name}-surficial`);
+            createPlotContainer("surficial", plot_id);
             createSurficialChart(data, args, true);
+
+            $(`#${marker_name}-surficial`).highcharts().update({
+                plotOptions: {
+                    series: {
+                        point: {
+                            events: {
+                                click ({ point }) {
+                                    const { x, y, id } = point;
+                                    $MARKERS_DATA_MODAL.find("#timestamp").text(moment(x).format("MMMM DD, YYYY HH:mm"));
+                                    $MARKERS_DATA_MODAL.find("#measurement").val(y);
+                                    $MARKERS_DATA_MODAL.find("#update-point").val(id);
+                                    $MARKERS_DATA_MODAL.modal("show");
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
             adjustHeightOfOtherColumns();
             $("#loading").modal("hide");
@@ -308,5 +333,42 @@ function updateSurficialMarker (input) {
     return $.post("/surficial/updateSurficialMarker", input)
     .catch((x) => {
         console.error("error", x);
+    });
+}
+
+function initializeMarkerDataPointOnClick () {
+    $MARKERS_DATA_MODAL.find("#update-point").click(({ target: { value: data_id } }) => {
+        $MARKERS_DATA_MODAL.modal("hide");
+        const measurement = $MARKERS_DATA_MODAL.find("#measurement").val();
+        const input = {
+            data_id,
+            measurement
+        };
+
+        updateMarkerDataPointMeasurement(input)
+        .done((ret) => {
+            $MARKERS_NAV.find("li.active").trigger("click");
+        });
+    });
+}
+
+function updateMarkerDataPointMeasurement (input) {
+    return $.post("/surficial/updateMarkerDataPointMeasurement", input)
+    .catch((x) => {
+        console.error("error", x);
+    });
+}
+
+function initializeSurficialDurationDropDownOnClick () {
+    $("#surficial-duration li").click(({ target }) => {
+        const { value, duration } = $(target).data();
+
+        $("#surficial-duration li.active").removeClass("active");
+        $(target).parent().addClass("active");
+
+        $("#surficial-duration-btn").empty()
+        .append(`${value} ${duration}&emsp;<span class="caret"></span>`);
+
+        $MARKERS_NAV.find("li.active").trigger("click");
     });
 }

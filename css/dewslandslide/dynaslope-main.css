@@ -86,26 +86,59 @@ html, body {
 #navigation {
   background-color: #F8991D;
   text-align: center;
-  height: 90px;
   border-radius: 0;
-  min-width: 1200px; }
+  min-width: 1200px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5); }
   #navigation ul {
     white-space: nowrap;
     list-style: none;
     min-width: 1200px; }
-    #navigation ul li {
+    #navigation ul li.dropdown {
       display: inline-block;
       position: relative;
       height: 90px;
       padding: 30px 50px 0;
       font-weight: bold;
-      font-size: 20px; }
-      #navigation ul li a {
-        text-decoration: none;
-        color: #17526D; }
-      #navigation ul li a:hover {
-        text-decoration: none;
-        color: white; }
+      font-size: 20px;
+      transition: 0.2s;
+      color: #17526D; }
+      #navigation ul li.dropdown .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 90px;
+        left: 0px;
+        right: 0px;
+        text-align: left;
+        font-size: 14px;
+        padding: 6px 0px;
+        background-color: #F8991D;
+        min-width: 185px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition: 0.2s; }
+        #navigation ul li.dropdown .dropdown-content a {
+          padding: 1px 20px;
+          color: #17526D;
+          text-decoration: none;
+          display: block;
+          transition: 0.2s; }
+        #navigation ul li.dropdown .dropdown-content a:hover {
+          background-color: #EEEEEE;
+          color: #F8991D; }
+      #navigation ul li.dropdown span.dropdown-header {
+        display: block;
+        padding: 3px 20px;
+        font-size: 12px;
+        line-height: 1.42857143;
+        color: #17526D;
+        white-space: nowrap; }
+    #navigation ul li:hover {
+      background-color: #ffffff;
+      color: #F8991D; }
+      #navigation ul li:hover .dropdown-content {
+        display: table; }
+    #navigation ul hr {
+      margin: 5px 0px; }
 
 .sticky {
   position: fixed;
@@ -171,10 +204,18 @@ textarea {
   color: #FFFFFF; }
 
 li.active > a {
-  background-color: #17526D !important; }
+  background-color: #F8991D !important; }
 
 select option:disabled {
   background-color: #EEEEEE; }
+
+.btn.btn-primary {
+  background-color: #17526D; }
+.btn.btn-warning {
+  background-color: #F8991D; }
+.btn.btn-danger {
+  background-color: #991B1E;
+  border-color: #991B1E; }
 
 .container-line {
   margin-top: 20px;

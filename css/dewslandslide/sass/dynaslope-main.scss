@@ -110,32 +110,74 @@ html, body { height: 100%; }
 #navigation {
     background-color: $primary-orange;
     text-align: center;
-    height: 90px;
+    // height: 90px;
     border-radius: 0;
     min-width: 1200px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 
     ul {
         white-space: nowrap;
         list-style: none;
         min-width: 1200px;
 
-        li {
+        li.dropdown {
             display: inline-block;
             position: relative;
             height: 90px;
             padding: 30px 50px 0;
             font-weight: bold;
             font-size: 20px;
+            transition: 0.2s;
+            color: $primary-blue;
 
-            a {
-                text-decoration: none;
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                top: 90px;
+                left: 0px;
+                right: 0px;
+                text-align: left;
+                font-size: 14px;
+                padding: 6px 0px;
+                background-color: $primary-orange;
+                min-width: 185px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 1;
+                transition: 0.2s;
+
+                a {
+                    padding: 1px 20px;
+                    color: $primary-blue;
+                    text-decoration: none;
+                    display: block;
+                    transition: 0.2s;
+                }
+
+                a:hover {
+                    background-color: #EEEEEE;
+                    color: $primary-orange;
+                }
+            }
+
+            span.dropdown-header {
+                display: block;
+                padding: 3px 20px;
+                font-size: 12px;
+                line-height: 1.42857143;
                 color: $primary-blue;
+                white-space: nowrap;
             }
+        }
 
-            a:hover {
-                text-decoration: none;
-                color: white;
-            }
+        li:hover {
+            background-color: #ffffff;
+            color: $primary-orange;
+            
+            .dropdown-content { display: table; }
+        }
+
+        hr {
+            margin: 5px 0px;
         }
     }
 }
@@ -250,11 +292,28 @@ textarea {
 }
 
 li.active {
-    & > a { background-color: $primary-blue !important; }
+    & > a { 
+        background-color: $primary-orange !important; 
+    }
 }
 
 select {
     option:disabled { background-color: #EEEEEE; }
+}
+
+.btn {
+    &.btn-primary {
+        background-color: $primary-blue;
+    }
+
+    &.btn-warning {
+        background-color: $primary-orange;
+    }
+
+    &.btn-danger {
+        background-color: $primary-red;
+        border-color: $primary-red;
+    }
 }
 
 // ===== END OF Panel CSS

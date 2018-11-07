@@ -262,12 +262,7 @@ function createSurficialChart (data, input, is_single_marker = false) {
                 marker: {
                     radius: 3
                 },
-                cursor: "pointer",
-                point: {
-                    events: {
-
-                    }
-                }
+                cursor: "pointer"
             }
         },
         credits: {
