@@ -5,15 +5,24 @@
  *	
 ****/
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Open Sans Bold';
   src: url("/fonts/Open Sans/OpenSans-ExtraBold.ttf");
   font-weight: bold;
   font-style: normal; }
+@font-face {
+  font-family: 'Open Sans';
+  src: url("/fonts/Open Sans/OpenSans-Regular.ttf");
+  font-weight: normal;
+  font-style: normal; }
+* {
+  font-family: 'Open Sans', sans-serif; }
+
 html, body {
   height: 100%; }
 
 #page-wrapper {
-  min-height: 67.7%; }
+  min-height: 67.7%;
+  padding: 40px 10px 10px; }
 
 #page-wrapper:after {
   content: "";
@@ -49,9 +58,11 @@ html, body {
   margin-top: 20px; }
 
 #project-name {
+  font-family: 'Open Sans Bold', sans-serif;
   font-size: 40px;
   color: #17526D;
-  line-height: 55px; }
+  line-height: 55px;
+  font-weight: 800; }
 
 #dynaslope-logo {
   /*width: 83.47px;*/
@@ -74,13 +85,13 @@ html, body {
   display: inline-block; }
 
 .nav-general-text {
-  font-family: 'Open Sans', sans-serif;
   font-size: 13px;
   font-weight: 800;
   display: inline-block;
   vertical-align: middle;
   padding-top: 14px; }
-  .nav-general-text span {
+  .nav-general-text div {
+    font-family: 'Open Sans Bold', sans-serif;
     display: block; }
 
 #navigation {
@@ -106,7 +117,7 @@ html, body {
         display: none;
         position: absolute;
         top: 90px;
-        left: 0px;
+        left: auto;
         right: 0px;
         text-align: left;
         font-size: 14px;
@@ -155,6 +166,10 @@ html, body {
     font-weight: 800;
     padding-top: 22px;
     color: #17526D; }
+    .sticky span#logo a {
+      font-family: 'Open Sans Bold', sans-serif;
+      text-decoration: none;
+      color: #17526D; }
 
 .sticky-wrapper {
   padding-top: 125px !important; }
@@ -175,6 +190,7 @@ textarea {
   min-width: 100%; }
 
 #page-header {
+  font-family: 'Open Sans Bold', sans-serif;
   font-size: 25px;
   font-weight: 600;
   color: #17526D;
@@ -275,5 +291,29 @@ select option:disabled {
   font-size: 22px;
   font-weight: 600;
   padding: 0 10px; }
+
+.alert_3 {
+  background-color: rgba(255, 50, 50, 0.5);
+  color: black; }
+
+.alert_2 {
+  background-color: rgba(255, 165, 0, 0.5);
+  color: black; }
+
+.alert_1 {
+  background-color: rgba(255, 255, 90, 0.5);
+  color: black; }
+
+.alert_nd {
+  background-color: #e0ffb3;
+  color: black; }
+
+label.error {
+  font-size: 12px;
+  font-style: italic;
+  margin: 10px 0 0 10px; }
+
+#loading .modal-body {
+  padding: 15px 15px 0; }
 
 /*# sourceMappingURL=dynaslope-main.css.map */

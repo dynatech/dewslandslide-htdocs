@@ -2,6 +2,7 @@
 let $MARKERS_NAV;
 let $MARKERS_MODAL;
 let $MARKERS_DATA_MODAL;
+let $VERIFICATION_MODAL;
 let CURRENT_MARKER;
 let MODAL_FORM;
 let MODAL_FORM_ID;
@@ -12,8 +13,10 @@ $(document).ready(() => {
 
     reposition("#markers-modal");
     reposition("#markers-data-modal");
+    reposition("#markers-verification-modal");
     $MARKERS_MODAL = $("#markers-modal");
     $MARKERS_DATA_MODAL = $("#markers-data-modal");
+    $VERIFICATION_MODAL = $("#markers-verification-modal");
 
     MODAL_FORM_ID = "#markers-modal form";
 
@@ -24,7 +27,8 @@ $(document).ready(() => {
     MODAL_FORM = initializeMarkerModalForm(MODAL_FORM_ID);
     validateMarkerModalForm(MODAL_FORM_ID);
 
-    initializeMarkerDataPointOnClick();
+    initializeMarkerDataSubmitBtnOnClick();
+    initializeVerificationModalBtnOnClick();
 
     (() => {
         $("#site_code").val("agb").trigger("change");
@@ -121,8 +125,7 @@ function initializeMarkerModalForm (form_id) {
             data.forEach(({ name, value }) => { input[name] = value === "" ? null : value; });
 
             const {
-                site_id, site_code,
-                marker_id, marker_name
+                site_id, marker_id, marker_name
             } = CURRENT_MARKER;
 
             let event = "add";
@@ -138,19 +141,8 @@ function initializeMarkerModalForm (form_id) {
                 event
             };
 
-            console.log(input);
-
-            if (MARKER_MODAL_SUBMIT === "update-marker") {
-                updateSurficialMarker(input)
-                .done((ret) => {
-                    $("#site_code").val(site_code).trigger("change");
-                });
-            } else {
-                insertNewMarker(input)
-                .done(() => {
-                    $("#site_code").val(site_code).trigger("change");
-                });
-            }
+            const modal_details = { event, marker_object: `Marker ${marker_name}` };
+            prepareVerificationModal(MARKER_MODAL_SUBMIT, input, modal_details);
         }
     });
 
@@ -336,8 +328,9 @@ function updateSurficialMarker (input) {
     });
 }
 
-function initializeMarkerDataPointOnClick () {
-    $MARKERS_DATA_MODAL.find("#update-point").click(({ target: { value: data_id } }) => {
+function initializeMarkerDataSubmitBtnOnClick () {
+    $MARKERS_DATA_MODAL.find(".submit-btn").click(({ target }) => {
+        const { value: data_id, id: btn_id } = target;
         $MARKERS_DATA_MODAL.modal("hide");
         const measurement = $MARKERS_DATA_MODAL.find("#measurement").val();
         const input = {
@@ -345,15 +338,23 @@ function initializeMarkerDataPointOnClick () {
             measurement
         };
 
-        updateMarkerDataPointMeasurement(input)
-        .done((ret) => {
-            $MARKERS_NAV.find("li.active").trigger("click");
-        });
+        let event = "update";
+        if (btn_id === "delete-point") event = "delete";
+
+        const modal_details = { event, marker_object: "specific data point" };
+        prepareVerificationModal(btn_id, input, modal_details);
     });
 }
 
 function updateMarkerDataPointMeasurement (input) {
     return $.post("/surficial/updateMarkerDataPointMeasurement", input)
+    .catch((x) => {
+        console.error("error", x);
+    });
+}
+
+function deleteMarkerDataPointMeasurement (input) {
+    return $.post("/surficial/deleteMarkerDataPointMeasurement", input)
     .catch((x) => {
         console.error("error", x);
     });
@@ -370,5 +371,65 @@ function initializeSurficialDurationDropDownOnClick () {
         .append(`${value} ${duration}&emsp;<span class="caret"></span>`);
 
         $MARKERS_NAV.find("li.active").trigger("click");
+    });
+}
+
+function prepareVerificationModal (btn_id, input, modal_details) {
+    $VERIFICATION_MODAL.removeData("input");
+    $VERIFICATION_MODAL.data("input", input);
+
+    $VERIFICATION_MODAL.find(".submit-btn").hide();
+    $VERIFICATION_MODAL.find(`#${btn_id}`).show();
+
+    const { event, marker_object } = modal_details;
+
+    $VERIFICATION_MODAL.find(".event").text(event.toUpperCase());
+    $VERIFICATION_MODAL.find(".marker-object").text(marker_object);
+
+    $VERIFICATION_MODAL.modal("show");
+}
+
+function initializeVerificationModalBtnOnClick () {
+    $VERIFICATION_MODAL.find(".submit-btn").click(({ target }) => {
+        $VERIFICATION_MODAL.modal("hide");
+
+        const { id: btn_id } = target;
+        const input = $VERIFICATION_MODAL.data("input");
+        console.log(btn_id, input);
+
+        if (btn_id === "update-marker") {
+            updateSurficialMarker(input)
+            .done((ret) => {
+                $("#site_code").trigger("change");
+            });
+        } else if (btn_id === "add-marker") {
+            insertNewMarker(input)
+            .done(() => {
+                $("#site_code").trigger("change");
+            });
+        } else if (btn_id === "delete-point") {
+            deleteMarkerDataPointMeasurement(input)
+            .done((ret) => {
+                $MARKERS_NAV.find("li.active").trigger("click");
+            });
+        } else if (btn_id === "update-point") {
+            updateMarkerDataPointMeasurement(input)
+            .done((ret) => {
+                $MARKERS_NAV.find("li.active").trigger("click");
+            });
+        }
+    });
+
+    $VERIFICATION_MODAL.find(".cancel-btn").click(() => {
+        $VERIFICATION_MODAL.modal("hide");
+
+        const $visible = $VERIFICATION_MODAL.find(".submit-btn:visible");
+        const btn_id = $visible.prop("id");
+
+        let $modal;
+        if (btn_id === "update-point" || btn_id === "delete-point") $modal = $MARKERS_DATA_MODAL;
+        else if (btn_id === "update-marker" || btn_id === "add-marker") $modal = $MARKERS_MODAL;
+
+        $modal.modal("show");
     });
 }

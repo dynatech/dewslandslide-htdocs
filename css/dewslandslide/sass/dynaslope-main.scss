@@ -9,16 +9,28 @@
 @import "variables";
 
 @font-face {
-    font-family: 'Open Sans';
+    font-family: 'Open Sans Bold';
     src:    url('/fonts/Open Sans/OpenSans-ExtraBold.ttf');
     font-weight: bold;
     font-style: normal;
 }
 
-html, body { height: 100%; }
+@font-face {
+    font-family: 'Open Sans';
+    src:    url('/fonts/Open Sans/OpenSans-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* { font-family: 'Open Sans', sans-serif;  }
+
+html, body {
+    height: 100%;
+}
 
 #page-wrapper {
     min-height: 67.7%;
+    padding: 40px 10px 10px;
 }
 
 #page-wrapper:after {
@@ -69,9 +81,12 @@ html, body { height: 100%; }
 }
 
 #project-name {
+    font-family: 'Open Sans Bold', sans-serif;
     font-size: 40px;
     color: $primary-blue;
     line-height: 55px;
+    font-weight: 800;
+
 }
 
 #dynaslope-logo {
@@ -95,14 +110,14 @@ html, body { height: 100%; }
 }
 
 .nav-general-text {
-    font-family: 'Open Sans', sans-serif;
     font-size: 13px;
     font-weight: 800;
     display: inline-block;
     vertical-align: middle;
     padding-top: 14px;
 
-    span {
+    div {
+        font-family: 'Open Sans Bold', sans-serif;
         display: block;
     }
 }
@@ -134,7 +149,7 @@ html, body { height: 100%; }
                 display: none;
                 position: absolute;
                 top: 90px;
-                left: 0px;
+                left: auto;
                 right: 0px;
                 text-align: left;
                 font-size: 14px;
@@ -200,6 +215,12 @@ html, body { height: 100%; }
         font-weight: 800;
         padding-top: 22px;
         color: $primary-blue;
+
+        a {
+            font-family: 'Open Sans Bold', sans-serif;
+            text-decoration: none;
+            color: $primary-blue;
+        }
     }
 }
 
@@ -234,6 +255,7 @@ textarea {
 //=====
 
 #page-header {
+    font-family: 'Open Sans Bold', sans-serif;
     font-size: 25px;
     font-weight: 600;
     color: $primary-blue;
@@ -404,3 +426,31 @@ select {
 }
 
 //===== END OF Line Divs
+
+.alert_3 {
+  background-color: rgba(255, 50, 50, 0.5);
+  color: black;
+}
+
+.alert_2 {
+  background-color: rgba(255, 165, 0, 0.5);
+  color: black;
+}
+
+.alert_1 {
+  background-color: rgba(255, 255, 90, 0.5);
+  color: black;
+}
+
+.alert_nd {
+  background-color: #e0ffb3;
+  color: black;
+}
+
+label.error {
+    font-size: 12px;
+    font-style: italic;
+    margin: 10px 0 0 10px;
+}
+
+#loading .modal-body { padding: 15px 15px 0; }
