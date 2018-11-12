@@ -1,3 +1,6 @@
+
+
+
 #bg-img-chatterbox {
 	z-index: 0;
 	max-width: 100%;
@@ -67,10 +70,14 @@
 
 #div-data-resolution {
   text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 #filter-category,#date-selector-rtracker,#filter-category-submit {
-  margin-top: 1.5%;
+  /*margin-top: 1.5%;*/
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 #div-data-resolution label,#data-resolution {
