@@ -43,7 +43,7 @@ function loadAllStaff() {
 			console.log(teams);
 			for (var counter = 0; counter < teams.length; counter++) {
 				$('.staff-wrapper').append('<div class="panel panel-primary">'+
-				'<div class="panel-heading"><h4>'+teams[counter][0].team_name+'</h4></div>'+
+				'<div class="panel-heading text-center panel-relative"><h3>'+teams[counter][0].team_name+'</h3></div><br>'+
 				'<div class="row staff-container">'+
 				'<div class="col-sm-12 '+teams[counter][0].team_name.replace(/\s/g,'')+'-team">'+
 				'</div>'+
@@ -53,7 +53,7 @@ function loadAllStaff() {
 
 			for (var counter = 0; counter < teams.length; counter++) {
 				for (var sub_counter = 0; sub_counter < teams[counter].length; sub_counter++) {
-					$('.'+teams[counter][0].team_name.replace(/\s/g,'')+'-team').append('<div class="col-sm-3 staff-profile">'+
+					$('.'+teams[counter][0].team_name.replace(/\s/g,'')+'-team').append('<div class="col-sm-4 staff-profile">'+
 						'<img src="../../images/staff_photos/'+teams[counter][sub_counter].fk_mid+'.jpg" class="img-thumbnail img-responsive" alt="'+teams[counter][sub_counter].full_name+'">'+
 						'<div class="staff-name">'+teams[counter][sub_counter].full_name+'</div>'+
 						'<div class="staff-attainment">'+teams[counter][sub_counter].education_attainment+'</div>'+

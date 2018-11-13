@@ -320,29 +320,37 @@ function displayOrganizationSelection (orgs,user_orgs = []) {
 	$('<div id="new-org" class="col-md-12"><a href="#" id="add-org"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;Organization not on the list?</a></div>').appendTo('#organization-selection-div');
 }
 
-function displayConversationPanel(msg_data, full_data, recipients, titles) {
+function displayConversationPanel(msg_data, full_data, recipients, titles, isOld = false) {
 	conversation_recipients = [];
+	last_outbox_ts = null;
+	last_inbox_ts = null;
+
 	recipients.forEach(function(user){
 		conversation_recipients.push(user.user_id);
 	});
-	$("#messages").empty();
-	$("#conversation-details").empty();
-	$(".recent_activities").addClass("hidden");
-	$("#main-container").removeClass("hidden");
-	if(full_data === undefined){
-		$("#conversation-details").append(conversation_details_label);
-	}else {
-		$("#conversation-details").append(full_data);
+
+	if (isOld == false) {
+		$("#messages").empty();
+		$("#conversation-details").empty();
+		if(full_data === undefined){
+			$("#conversation-details").append(conversation_details_label);
+		}else {
+			$("#conversation-details").append(full_data);
+		}
+
+		$(".recent_activities").addClass("hidden");
+		$("#main-container").removeClass("hidden");
+		message_container = [];
+		recipient_container = [];
+		msg_data.reverse();
 	}
-	message_container = [];
-	recipient_container = [];
+
 	recipients.forEach(function(mobile_data){
 		if (recipient_container.includes(mobile_data.mobile_id) != true) {recipient_container.push(mobile_data.mobile_id);}
 	});
-	msg_data.reverse();
+	
 	let counter = 0;
 	msg_data.forEach(function(data) {
-		console.log(data.network);
 		if (titles != null) {
 			let title_container = titles[counter].split("<split>");
 			let title_holder = "";
@@ -356,21 +364,52 @@ function displayConversationPanel(msg_data, full_data, recipients, titles) {
 		} else {
 			data.isGlobe = false;
 		}
-		displayUpdatedMessages(data);
+		displayUpdatedMessages(data, isOld);
 		counter++;
 	});
 }
 
-function displayUpdatedMessages(data) {
+function displayUpdatedMessages(data, isOld = false) {
 	latest_conversation_timestamp = data.ts_written;
 	data.ts_received == null ? data.isYou = 1 : data.isYou = 0;
+	setLastTs(isOld, data);
 	data.sms_msg = data.sms_msg.replace(/\n/g, "<br />");
 	message_container.unshift(data);
 	messages_html = messages_template_both({'messages': message_container});
 	let html_string = $('#messages').html();
-	$('#messages').html(html_string+messages_html);
-	$('.chat-message').scrollTop($('#messages').height());
+	if (isOld == false) {
+		$('#messages').html(html_string+messages_html);
+		$('.chat-message').scrollTop($('#messages').height());
+	} else {
+		console.log($('#messages').height());
+		$('.chat-message').scrollTop($('#messages').height()/2);
+		$('#messages').html(messages_html+html_string);
+	}
 	message_container = [];
+}
+
+function setLastTs(isOld, data) {
+	if (isOld == true) {
+		if (data.isYou == 1) {
+			last_outbox_ts = data.ts_written;
+		}
+
+		if (data.isYou == 0) {
+			last_inbox_ts = data.ts_received;
+		}
+	} else {
+		if (last_outbox_ts == null) {
+			if (data.isYou == 1) {
+				last_outbox_ts = data.ts_written;
+			}
+		}
+
+		if (last_inbox_ts == null) {
+			if (data.isYou == 0) {
+				last_inbox_ts = data.ts_received;
+			}
+		}
+	}
 }
 
 function displayAddEmployeeContactMessage (msg_data) {
@@ -1324,4 +1363,8 @@ function resetCaseDiv () {
     case_div.empty();
     special_case_num = 0;
     special_case_id = 0;
+}
+
+function scrollOldMessages() {
+
 }

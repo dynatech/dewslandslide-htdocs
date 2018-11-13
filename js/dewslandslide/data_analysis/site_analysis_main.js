@@ -6,7 +6,7 @@ $(document).ready(() => {
     const paths = window.location.pathname.split("/");
     reposition("#error-modal");
 
-    if (paths[2] !== "eos_charts" || paths[3] !== "") {
+    if (paths[2] === "site_analysis") {
         adjustOptionsBarOnWindowResize();
         createStickyOptionsBar();
         initializeTimestamps();

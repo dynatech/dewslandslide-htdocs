@@ -404,6 +404,7 @@ function initializeEventDetailsOnLoad (...args) {
     const ids = ["#site-code", "#address", "#event_timeframe"];
     ids.forEach((id, index) => {
         $(id).text(args[index]);
+        recenterTimelineHeadText();
     });
 }
 

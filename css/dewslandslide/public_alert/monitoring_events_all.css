@@ -14,7 +14,3 @@ table td, table th
     font-size: 15px;
     color:black;
 }
-
-.on-going { background-color: rgba(246, 1, 1, 0.41); }
-.invalid { background-color: rgba(105, 105, 105, 0.4); }
-.finished, .extended { background-color: rgba(9, 147, 45, 0.49); }

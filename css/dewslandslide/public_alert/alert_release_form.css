@@ -15,22 +15,19 @@ input[type="checkbox"] {
     bottom: 6px;
 }
 
-#site_info_area .panel-body {
-    background-color: rgba(235, 204, 204, 0.5);
-}
 
-#status {
+#site_info_area #status {
     font-size: 21px;
     font-weight: 600;
     border-right: 3px solid #777;
 }
 
-#current_alert { 
+#site_info_area #current_alert { 
     font-size: 21px;
     font-weight: 600;
 }
 
-#details {
+#site_info_area #details {
     font-size: 14px;
     border-right: 3px solid #777;
 }
@@ -48,12 +45,6 @@ input[type="checkbox"] {
 
 .checkbox.a1d label input {
     margin-left: -40px;
-}
-
-label.error {
-    font-size: 12px;
-    font-style: italic;
-    margin: 10px 0 0 10px;
 }
 
 .divider:not(:last-child) {
@@ -97,7 +88,7 @@ label.error {
     height: 68px;
     width: 100px;
     margin-top: -6px;
-    z-index: 100;
+    z-index: 5;
     -webkit-transition: width 0s ease-out, position;
 }
 
@@ -111,7 +102,7 @@ label.error {
 .previous_info > div {
     font-size: 22px;
     text-shadow: 1px 1px #333;
-    color: red;
+    color: #C9302C;
     padding-top: 12px;
     padding-left: 2px;
     padding-right: 4px;

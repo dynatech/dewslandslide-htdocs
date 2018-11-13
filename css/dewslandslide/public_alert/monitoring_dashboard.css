@@ -7,11 +7,6 @@
  *	
 ****/
 
-#map-canvas { 
-	min-width: 20%;
-	/*max-height: 1000px;*/
-}
-
 table {
 	text-align: left;
 }
@@ -25,7 +20,6 @@ table {
 }
 
 .panel-body {
-	font-size: 14px;
 	vertical-align: middle;
 	color: black;
 }
@@ -89,117 +83,12 @@ hr {
     margin-bottom: 5px;
 }
 
-#ewi-asap-modal,#success-ewi-modal{
+#ewi-asap-modal, #success-ewi-modal {
    width: 100%;
 }
 
 #primer { font-size: 13px; }
 #primer > ul { margin: 5px 0 0 20px; }
-
-.text-area {
-	margin: 0.5in;
-}
-
-.center-text {
-	text-align: center;
-}
-
-#phivolcs, #dost{
-	width: 66px; //165px*0.50
-	height: 77.6px; //194px*0.50
-}
-
-#header-text div {
-	margin: 0;
-}
-
-#header-text > div:nth-child(1) {
-	font-size: 10px;
-	font-weight: bold;
-	color: blue;
-}
-
-#header-text > div:nth-child(2) {
-	font-size: 12px;
-	font-weight: bold;
-	color: red !important;
-}
-
-#header-text > div:nth-child(3) {
-	font-size: 16px;
-	font-weight: bold;
-	color: #000080 !important;
-}
-
-#header-text > div:nth-child(4), #header-text > :nth-child(5), #header-text > :nth-child(6), #header-text > :nth-child(7) {
-	font-size: 8px;
-	color: blue !important;
-}
-
-#title {
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-h2 {
-	font-size: 20px;
-}
-
-#ewi-modal-cs-dialog h2 {
-	text-align: center;
-}
-
-#bulletin, #areaSituation, #footer {
-	font-size: 16px;
-}
-
-#bulletin .row {
-	margin: 8px 0;
-}
-
-#areaSituation .row {
-	margin: 15px 0;
-}
-
-#bulletin .col-sm-8 {
-	padding-left: 0;
-	font-weight: bold;
-}
-
-#areaSituation h3 {
-	font-size: 18px;
-	margin-top: 0;
-}
-
-#areaSituation p {
-	text-indent: 60px;
-}
-
-.rowIndent {
-	padding-left: 60px;
-}
-
-#footer	{
-	margin-top: 15px;
-}
-
-#info {
-	font-size: 18px;
-	font-weight: bold;
-}
-
-#sendBulletinModal .modal-body { padding-bottom: 0; }
-#resultModal .modal-body, #errorModal .modal-body { font-size: 14px; }
-
-label.error {
-    font-size: 12px;
-    font-style: italic;
-    margin: 10px 0 0 10px;
-}
-
-h3.popover-title { font-weight: bold; font-size: 16px!important; background: #C0C0C0; }
-.popover-content { background: #A9A9A9; }
-#reminder { font-size: 13px; color: red; font-weight: bold; }
 
 .invalid_area { color: red; }
 
@@ -220,4 +109,8 @@ h3.popover-title { font-weight: bold; font-size: 16px!important; background: #C0
 
 #invalid-alerts-group .alert {
 	margin-bottom: 5px;
+}
+
+.panel table {
+	border: 0;
 }

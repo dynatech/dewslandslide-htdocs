@@ -1,0 +1,86 @@
+
+/****
+ *
+ *  Created by Kevin Dhale dela Cruz
+ *  CSS file for the EWI Bulletin [public_alert/bulletin_builder.php]
+ *  [host]/bulletin/build/[release_id]
+ *  
+****/
+
+@import "variables";
+
+body { zoom: 0.75; }
+
+@media print {
+    color: #000;
+}
+
+a i {
+    color: blue !important;
+}
+
+a[href]:after {
+    content: none !important;
+}
+
+#bulletin-area {
+    margin: 1in;
+
+    #phivolcs, #dost{
+        width: 123.75px;
+        height: 145.5px;
+    }
+
+    #header-text > div {
+        margin: -5px;
+
+        &:nth-child(1) {
+            font-size: 20px;
+        }
+
+        &:nth-child(2) {
+            font-size: 22px;
+        }
+
+        &:nth-child(3) {
+            font-size: 27px;
+        }
+
+        &:nth-child(4),
+        &:nth-child(5),
+        &:nth-child(6),
+        &:nth-child(7) {
+            font-size: 18px;
+        }
+    }
+
+    #title {
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    #bulletin, #areaSituation, #footer {
+        font-size: 24px;
+    }
+
+    #bulletin {
+        .row {
+            margin: 10px 0;
+        }
+    }
+
+    #areaSituation {
+        .row {
+            margin: 12px 0;
+        }
+
+        h3 {
+            font-size: 26px;
+        }
+    }
+
+    #footer {
+        margin-top: 20px;
+    }
+
+}

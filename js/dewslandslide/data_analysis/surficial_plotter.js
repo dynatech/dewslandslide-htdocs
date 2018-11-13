@@ -81,7 +81,7 @@ function initializeSurficialMarkersButton () {
                     $loading_surficial.hide();
                     createSVG("surficial", input.site_code);
                 })
-                .then(() => getGroundMarkerAndMarkerId(input.site_code))
+                .then(() => getSurficialMarkers(input.site_code))
                 .then((series) => {
                     console.log(series);
                     createSurficialMarkersButton(series);
@@ -147,8 +147,8 @@ function getPlotDataForSurficial (args, isEOS = false) {
     return $.getJSON(url);
 }
 
-function getGroundMarkerAndMarkerId (site_code, isEOS = false) {
-    let url = `/../site_analysis/getGroundMarkerAndMarkerId/${site_code}`;
+function getSurficialMarkers (site_code, isEOS = false) {
+    let url = `/../surficial/getSurficialMarkers/${site_code}`;
     url = isEOS ? `/../../../../../..${url}` : url;
 
     return $.getJSON(url);
@@ -186,10 +186,28 @@ function plotSurficial (series, input) {
     createSurficialChart(series, input);
 }
 
-function createSurficialChart (data, input) {
+/**
+ * Creates a surficial chart.
+ *
+ * @param      {<type>}   data              The data
+ * @param      {<type>}   input             The input
+ * @param      {boolean}  is_single_marker  Indicates if single marker
+ *                                          (used on surficial_markers_page)
+ */
+function createSurficialChart (data, input, is_single_marker = false) {
     const { site_code, start_date, end_date } = input;
 
-    $(`#${site_code}-surficial`).highcharts({
+    let title_var = site_code.toUpperCase();
+    let identifier = site_code;
+    let subtext = "";
+    if (is_single_marker === true) {
+        const { marker_name, site_name } = input;
+        identifier = marker_name;
+        title_var = `Marker ${marker_name.toUpperCase()}`;
+        subtext = `Site: <b>${site_name.toUpperCase()}<b><br/>`;
+    }
+
+    $(`#${identifier}-surficial`).highcharts({
         series: data,
         chart: {
             type: "line",
@@ -205,11 +223,11 @@ function createSurficialChart (data, input) {
             }
         },
         title: {
-            text: `<b>Surficial Data History Chart of ${site_code.toUpperCase()}</b>`,
+            text: `<b>Surficial Data History Chart of ${title_var}</b>`,
             y: 22
         },
         subtitle: {
-            text: `As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
+            text: `${subtext}As of: <b>${moment(end_date).format("D MMM YYYY, HH:mm")}</b>`,
             style: { fontSize: "13px" }
         },
         yAxis: {
@@ -244,12 +262,7 @@ function createSurficialChart (data, input) {
                 marker: {
                     radius: 3
                 },
-                cursor: "pointer",
-                point: {
-                    events: {
-
-                    }
-                }
+                cursor: "pointer"
             }
         },
         credits: {

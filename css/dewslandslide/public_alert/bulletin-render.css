@@ -1,0 +1,48 @@
+/****
+ *
+ *  Created by Kevin Dhale dela Cruz
+ *  CSS file for the EWI Bulletin [public_alert/bulletin_builder.php]
+ *  [host]/bulletin/build/[release_id]
+ *  
+****/
+body {
+  zoom: 0.75; }
+
+@media print {
+  color: #000; }
+a i {
+  color: blue !important; }
+
+a[href]:after {
+  content: none !important; }
+
+#bulletin-area {
+  margin: 1in; }
+  #bulletin-area #phivolcs, #bulletin-area #dost {
+    width: 123.75px;
+    height: 145.5px; }
+  #bulletin-area #header-text > div {
+    margin: -5px; }
+    #bulletin-area #header-text > div:nth-child(1) {
+      font-size: 20px; }
+    #bulletin-area #header-text > div:nth-child(2) {
+      font-size: 22px; }
+    #bulletin-area #header-text > div:nth-child(3) {
+      font-size: 27px; }
+    #bulletin-area #header-text > div:nth-child(4), #bulletin-area #header-text > div:nth-child(5), #bulletin-area #header-text > div:nth-child(6), #bulletin-area #header-text > div:nth-child(7) {
+      font-size: 18px; }
+  #bulletin-area #title {
+    margin-top: 25px;
+    margin-bottom: 15px; }
+  #bulletin-area #bulletin, #bulletin-area #areaSituation, #bulletin-area #footer {
+    font-size: 24px; }
+  #bulletin-area #bulletin .row {
+    margin: 10px 0; }
+  #bulletin-area #areaSituation .row {
+    margin: 12px 0; }
+  #bulletin-area #areaSituation h3 {
+    font-size: 26px; }
+  #bulletin-area #footer {
+    margin-top: 20px; }
+
+/*# sourceMappingURL=bulletin-render.css.map */

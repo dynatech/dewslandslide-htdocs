@@ -693,18 +693,18 @@ function initializeOnAvatarClickForTagging() {
 		message_details = null;
 		tag_container = $(this).closest("li.clearfix");
 		message_details = $(this).closest("li.clearfix").find("input[class='msg_details']").val().split('<split>');
+		console.log(message_details);
 		const gintag_selected = $("#gintag_selected").tagsinput("items");
 		user = message_details[2].split(" ");
-		site_code = user[0].toLowerCase();
-		getSmsTags(message_details[0]);
-		console.log(message_details[0]);
+		getSmsTags(message_details[0],message_details[1]);
 	});
 }
 
-function getSmsTags (sms_id) {
+function getSmsTags (sms_id, mobile_id) {
 	const message = {
 		type: "getSmsTags",
-		data: sms_id
+		data: sms_id,
+		mobile_id: mobile_id
 	}
 
 	wss_connect.send(JSON.stringify(message));
@@ -758,8 +758,6 @@ function initializeOnClickConfirmTagging () {
 				$("#narrative-modal").modal({backdrop: 'static', keyboard: false});
 				$("#gintag-modal").modal("hide");
 				temp_important_tag = important;
-				// onClickConfirmNarrative(message_details, important, site_code);
-
 				$("#narrative_message").empty();
 				$("#narrative_message").append(
 					"Contact(s) to be tagged: " + "&#013;&#010;"+ 
@@ -814,10 +812,16 @@ function addNewTags (message_details, new_tag, is_important, site_code, recipien
 function initializeOnClickConfirmNarrative () {
 
 	$("#save-narrative").click(function(event){
+
+		let sites_selected = [];
+		$(".sites-to-tag input:checked").each(function() {
+		    sites_selected.push($(this).closest('label').text());
+		});
+
 		if (message_details[2] != "You") {
-			addNewTags(message_details, temp_important_tag, true, site_code);
+			addNewTags(message_details, temp_important_tag, true, sites_selected);
 		} else {
-			addNewTags(message_details, temp_important_tag, true, site_code, recipient_container);
+			addNewTags(message_details, temp_important_tag, true, sites_selected, recipient_container);
 		}
 	});
 }
@@ -840,15 +844,25 @@ function displayConversationTags (conversation_tags) {
 		conversation_tags.forEach(function(tag) {
 			$("#gintag_selected").tagsinput("add", tag);
 		});
-		$(".bootstrap-tagsinput").keypress(function(){
-			console.log("pressed");
-			console.log($("#gintag_selected").val());
-		});
 	}else {
 		$("#gintag_selected").tagsinput('removeAll');
 		conversation_tags.forEach(function(tag) {
 			$("#gintag_selected").tagsinput("add", tag);
 		});
+	}
+}
+
+function displaySitesToTag(sites) {
+	console.log(sites);
+	$("#tag_sites").empty();
+	for (var i = 0; i < sites.length; i++) {
+		sitename = sites[i].site_code;
+		site_id = sites[i].site_id;
+		if (i == 0) {
+			$("#tag_sites").append('<div class="checkbox col-xs-2"><label class="sites-to-tag"><input name="sitenames" type="checkbox" value="'+site_id+'" checked>'+sitename.toUpperCase()+'</label></div>');
+		} else {
+			$("#tag_sites").append('<div class="checkbox col-xs-2" style="margin-top: 10px;"><label class="sites-to-tag"><input name="sitenames" type="checkbox" value="'+site_id+'" checked>'+sitename.toUpperCase()+'</label></div>');
+		}
 	}
 }
 
@@ -1199,7 +1213,7 @@ function loadSiteConvoViaQacess() {
     	$("#conversation-details").append(conversation_details_label);
     	let convo_request = {
 			'type': 'loadSmsForSites',
-			'organizations': [],
+			'organizations': ['LEWC','BLGU','MLGU','PLGU'],
 			'sitenames': site_names,
 			'site_code': site_code
 		};

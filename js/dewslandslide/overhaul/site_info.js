@@ -187,6 +187,7 @@ function getAllSites(){
 }
 
 function displayAllSites(data){
+    console.log(data);
 	$("#sites-table").empty();
 	$("#sites-table").DataTable({
 		destroy: true,

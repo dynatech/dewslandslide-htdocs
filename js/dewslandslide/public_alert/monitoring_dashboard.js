@@ -163,7 +163,7 @@ function buildDashboardTables (socket_data) {
                 const { internal_alert_level } = data;
                 let temp = internal_alert_level.slice(0, 2);
                 if (temp === "ND") { temp = (internal_alert_level.length > 2) ? "A1" : "A0"; }
-                $(row).addClass(`alert_${temp.charAt(1)}`);
+                $(row).addClass(`alert-${temp.charAt(1)}`);
             },
             initComplete () {
                 let row_count = 0;
@@ -776,9 +776,11 @@ function initializeReleaseModalForm () {
                     $(".trigger_switch").each((count, item) => {
                         if (!$(item).is(":checked")) {
                             const haystack = list.join("").toUpperCase();
-                            const x = item.value === "rain" ? "R" : "S";
+                            const x = item.value === "rainfall" ? "R" : "S";
                             const index = haystack.indexOf(x);
-                            list.splice(index, 1);
+                            
+                            // Splice trigger only if it exists
+                            if (index !== -1) list.splice(index, 1);
                         }
                     });
 

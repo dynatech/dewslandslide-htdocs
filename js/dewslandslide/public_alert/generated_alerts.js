@@ -1,14 +1,4 @@
 
-// $(document).ready(() => {
-//     $.getJSON("../monitoring/get_public_json")
-//     .done(([data]) => {
-//         const { alerts, invalids } = data;
-//         createInvalidPanels(invalids);
-//         createAlertPanels(alerts);
-//         createPanelTables(alerts);
-//     });
-// });
-
 function processReceivedGeneratedAlerts ([data]) {
     const { alerts, invalids } = data;
 
@@ -31,6 +21,8 @@ function processReceivedGeneratedAlerts ([data]) {
     createInvalidPanels(invalids);
     createAlertPanels(alerts);
     createPanelTables(alerts);
+
+    $("#generated-alerts-tab .panel").css("padding-bottom", 0);
 }
 
 function createInvalidPanels (invalids) {
@@ -76,7 +68,7 @@ function createAlertPanels (alerts) {
             $("#alert-header").prop("hidden", false);
             const $alert_panel = $("#alert-panel-template").clone().removeAttr("id");
 
-            let panel_color = "panel-info";
+            let panel_color = "panel-a1";
             switch (public_alert) {
                 case "A2": panel_color = "panel-warning"; break;
                 case "A3": panel_color = "panel-danger"; break;

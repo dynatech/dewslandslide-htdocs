@@ -161,9 +161,15 @@ function renderPDF (id) {
         data: { edits: edits.join("**") }
     })
     .done((response) => {
-        if (response === "Success.") { console.log("PDF RENDERED"); } else console.log(response);
+        if (response === "Success.") {
+            console.log("PDF RENDERED");
+            $LOADING.modal("hide");
+            $LOADING.find(".progress-bar").text("Loading...");
+        } else console.log(response);
     })
     .catch((x) => {
+        $LOADING.modal("hide");
+        $LOADING.find(".progress-bar").text("Loading...");
         sendBulletinError(`error rendering PDF\n${x.responseText}`);
         showErrorModal(x, "rendering PDF");
     });
