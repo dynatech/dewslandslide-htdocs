@@ -22,8 +22,9 @@ $(document).ready(function(e) {
 	function validateInput(){
 
 		$('#confirm-filter-btn').click(function(){
+			$('#response_tracker-loader-modal').modal({backdrop: 'static', keyboard: false});
 			let filter_data = {}
-
+			let data;
 			filter_data['category'] = $('#category-selection').val()
 
 			if ($("#category-selection").val() != "allsites" && $("#filter-key").val()){
@@ -57,8 +58,14 @@ $(document).ready(function(e) {
 					data['firstname'] = name[1]
 				}
 
-				processgraph(data,filter_by)
+				let graph = processgraph(data,filter_by)
+				if (graph){
+					$("#response_tracker-loader-modal").modal("hide");
+				}else{
+					alert('Error')
+				}
 			}
+			
 
 		});
 	}
@@ -68,7 +75,9 @@ $(document).ready(function(e) {
 		$('#category-selection').change(function() {
 			$("#confirm-filter-btn").prop('disabled', false);
 			if ($( this ).val() == "allsites"){
+				$("#filter-key").val('');
 				$("#filter-key").prop('disabled', true);
+
 			}else{
 				$("#filter-key").prop('disabled', false);
 				$.get( "../responsetracker/get"+$('#category-selection').val(), function( data ) {
@@ -302,7 +311,7 @@ $(document).ready(function(e) {
 
 
 	function processgraph(data,obj_filter){
-		$.post( "../responsetracker/analytics", {input: JSON.stringify(data)})
+	$.post( "../responsetracker/analytics", {input: JSON.stringify(data)})
 		.done(function(response) {
 			let result = JSON.parse(response);
 			let filtered_by_resolution = filterJsonObj(result,obj_filter);
@@ -312,7 +321,10 @@ $(document).ready(function(e) {
 			let filtered_by_four = filterJsonObj(result,obj_filter,by_four=true);
 			let series_data_average = getSeriesdatainAvg(filtered_by_four);
 			highChartbuilderAverage(data, series_data_average)
+			
 		});
+
+	return true
 
 	}
 
@@ -356,9 +368,9 @@ $(document).ready(function(e) {
 				headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
 
 				pointFormat: ( '<br><b>{point.series.name}</b> Statistics: <b>{point.y}%</b>' +
-					'<br>Fastest response delay: </td><b> {point.series.options.max} min</b>'+
-					'<br>Average response delay: </td><b> {point.series.options.avg} min</b>'+
-					'<br>Slowest response delay: </td><b> {point.series.options.min} min</b>'+
+					'<br>Fastest response delay: </td><b> {point.series.options.max}</b>'+
+					'<br>Average response delay: </td><b> {point.series.options.avg}</b>'+
+					'<br>Slowest response delay: </td><b> {point.series.options.min}</b>'+
 					'<br>Standard deviation: </td><b> {point.series.options.deviation}</b>'+
 					'<br>Total response count: </td><b> {point.series.options.total_response}</b>'+
 					'<br>Total DYNASLOPE message count: <b>{point.series.options.total}</b>'),
@@ -445,161 +457,6 @@ $(document).ready(function(e) {
 			});
 
 	}
-
 	
-
-	function analyzeAverageDelayReply(data){;
-		if (groupedSiteFlagger == false){
-			column_value = [];
-		}
-		for (let i=0;i<data.length;i++){
-			let chatterbox_date = "";
-			let sender_date = "";
-			let date_arr = [];
-			let average_delay = "";
-			data_validator_replies = 0;
-			data_validator_dyna_msg = 0;
-			for (let x = 0;x<data[i].values.length;x++){
-
-				if ($('#data-validator').val() == "on") { // Lagay validation kung 4 hours ang validity
-					if (chatterbox_date == "" || sender_date == "") {
-						if (data[i].values[x].user == "You") {
-							data_validator_dyna_msg++;
-							chatterbox_date = data[i].values[x].timestamp;
-						} else {
-							if (chatterbox_date != "") {
-								sender_date = data[i].values[x].timestamp;
-								data_validator_replies++;
-							}
-						}
-					}  else {
-
-						if (moment(chatterbox_date).add(4, 'hours').valueOf() <= moment(sender_date).valueOf()) {
-							sender_date = ""; // Sets the sender_date to empty/Invalid
-							chatterbox_date = ""; // Sets the chatterbox_date ('YOU') to empty/Invalid
-						} else {
-							//Computes the delay and push it to an array.
-							if (chatterbox_date != "" && sender_date != ""){
-								if (moment(chatterbox_date) > moment(sender_date)) {
-									let date1 = moment(chatterbox_date);
-									let date2 = moment(sender_date);
-									let diff = date1.diff(date2,'minutes');
-									date_arr.push(diff);
-									chatterbox_date = "";
-									sender_date = "";
-								} else {
-									let date1 = moment(chatterbox_date);
-									let date2 = moment(sender_date);
-									let diff = date2.diff(date1,'minutes');
-									date_arr.push(diff);
-									chatterbox_date = "";
-									sender_date = "";
-								}
-							}
-						}
-					}
-				} else {
-					if (chatterbox_date == "" || sender_date == "") {
-						if (data[i].values[x].user == "You") {
-							chatterbox_date = data[i].values[x].timestamp;
-							data_validator_dyna_msg++;
-						} else {
-							sender_date = data[i].values[x].timestamp;
-							data_validator_replies++;
-						}
-					} else {
-						//Computes the delay and push it to an array.
-						if (chatterbox_date != "" && sender_date != ""){
-							if (moment(chatterbox_date) > moment(sender_date)) {
-								let date1 = moment(chatterbox_date);
-								let date2 = moment(sender_date);
-								let diff = date1.diff(date2,'minutes');
-								date_arr.push(diff);
-								chatterbox_date = "";
-								sender_date = "";
-							} else {
-								let date1 = moment(chatterbox_date);
-								let date2 = moment(sender_date);
-								let diff = date2.diff(date1,'minutes');
-								date_arr.push(diff);
-								chatterbox_date = "";
-								sender_date = "";
-							}
-						}
-					}
-				}
-			}
-
-
-			//Get's the shortest reply time. 
-			let minimum = Math.min.apply(Math, date_arr);
-			let uniqueArray = [];
-			if (minimum == 0) {
-				let intArray = date_arr.map(Number);
-				// sorts the array
-				let second = intArray.sort(function(a,b){return b-a});
-				uniqueArray = second.filter(function(item, pos) {
-					return second.indexOf(item) == pos;
-				})
-				minimum = uniqueArray[uniqueArray.length-2];
-			} else if (minimum == Infinity) {
-				minimum = "NaN";
-			}
-
-			//Get's the average reply time. 
-			let tot = 0;
-			for (let y = 0;y < date_arr.length;y++) {
-				tot = tot + date_arr[y];
-			}
-			tot = tot/date_arr.length-1;
-			//Get's the Maximum / Longest reply delay
-			let maximum = Math.max.apply(Math, date_arr);
-			if (maximum == -Infinity || maximum == Infinity) {
-				maximum = "NaN";
-			}
-			//Get's the standard deviation
-			let mean = tot;
-			let steptwo = 0;
-			let toDeviation = [];
-			for (let q = 0; q < date_arr.length;q++){
-				steptwo = Math.pow((date_arr[q] - mean),2);
-				toDeviation.push(steptwo);
-			}
-
-			let tot_todeviation = 0;
-			for (let l = 0; l < toDeviation.length;l++){
-				tot_todeviation = tot_todeviation + toDeviation[l];
-			}
-
-			let toBeSquared = tot_todeviation/toDeviation.length;
-			let standard_deviation = Math.sqrt(toBeSquared);
-
-			column_value.push({
-				name: data[i].number,
-				y: tot,
-				summary: getTimeFromMins(tot)
-			});
-
-
-			detailedInformation.push({
-				min: minimum,
-				ave: tot,
-				max: maximum,
-				deviation: standard_deviation
-			});
-			tot = 0;
-			date_arr = [];
-			chatterbox_date = "";
-			sender_date = "";
-
-			mes_res = {
-				total_response: data_validator_replies,
-				total_message: data_validator_dyna_msg
-			}
-
-			total_message_and_response.push(mes_res);
-
-		}
-	}
 
 });
