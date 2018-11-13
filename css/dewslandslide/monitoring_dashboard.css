@@ -1,11 +1,9 @@
 
-/****
- *
+/*
  *	Created by Kevin Dhale dela Cruz
- *	CSS file for Monitoring Dashboard [public_alert/monitoring_dashboard.php]
- *	[host]/home or [host]/dashboard
- *	
-****/
+ *	CSS file for Monitoring Dashboard
+ *	[base]/home or [base]/dashboard
+ */
 
 #map-canvas { 
 	min-width: 20%;
@@ -61,32 +59,10 @@ hr {
 	background-color: rgba(8, 139, 42, 0.5);
 }
 
-.day-overdue {
-	background-color:  rgba(60, 60, 60, 0.5);
-}
-
-.day-overdue-square {
-	color:  rgba(60, 60, 60, 0.8);
-	background-color: rgba(60, 60, 60, 0.5);
-}
-
-#ewi-recipients-container {
-	display: inline-flex;
-	margin-bottom: 10px;
-}
-
-#ewi-recipients-container label{
-	padding-top: 5px;
-}
-
 .close { margin-top: -3px; }
 
-#send-btn-ewi-amd,#edit-btn-ewi-amd {
+#send-btn-ewi-amd {
     margin-top: 10px;
-}
-
-#additional-recipients {
-    margin-bottom: 5px;
 }
 
 #ewi-asap-modal,#success-ewi-modal{
@@ -189,35 +165,10 @@ h2 {
 }
 
 #sendBulletinModal .modal-body { padding-bottom: 0; }
-#resultModal .modal-body, #errorModal .modal-body { font-size: 14px; }
+#resultModal .modal-body { font-size: 14px; }
 
 label.error {
     font-size: 12px;
     font-style: italic;
     margin: 10px 0 0 10px;
-}
-
-h3.popover-title { font-weight: bold; font-size: 16px!important; background: #C0C0C0; }
-.popover-content { background: #A9A9A9; }
-#reminder { font-size: 13px; color: red; font-weight: bold; }
-
-.invalid_area { color: red; }
-
-.valid-square {
-	color: rgba(0,128,0,0.8);
-	background-color: rgba(0,128,0,0.5);
-}
-
-.partial-square {
-	color: rgba(255,165,0,0.8);
-	background-color: rgba(255,165,0,0.5);
-}
-
-.invalid-square {
-	color: rgba(255,0,0,0.8);
-	background-color: rgba(255,0,0,0.5);
-}
-
-#invalid-alerts-group .alert {
-	margin-bottom: 5px;
 }

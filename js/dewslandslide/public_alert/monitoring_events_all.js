@@ -1,7 +1,7 @@
 
 /****
- *  Created by Kevin Dhale dela Cruz
- *  JS file for Monitoring Events Table [public_alert/monitoring_events_all.php]
+ *	Created by Kevin Dhale dela Cruz
+ *	JS file for Monitoring Events Table [public_alert/monitoring_events_all.php]
  *  [host]/public_alert/monitoring_events
  ****/
 
@@ -28,42 +28,42 @@ $(document).ready(() => {
 
                 data.extra_filter = {
                     hasFilter: status !== null || site !== null,
-                    status,
-                    site
+                    status: status,
+                    site: site
                 };
             }
         },
         columns: [
             {
                 data: "event_id",
-                render (data, type, full, meta) {
-                    return `<a href='/../monitoring/events/${data}'>${data} <span class="fa fa-link"></span></a>`;
+                render: (data, type, full, meta) => {
+                    return `<a style='color:blue'  href='/../monitoring/events/${data}'>${data}</a>`;
                 }
             },
             {
                 data: "site_code",
-                render (data, type, full, meta) {
-                    return `${data.toUpperCase()} (${full.barangay}, ${full.municipality}, ${full.province})`;
+                render: (data, type, full, meta) => {
+                    return `${data.toUpperCase()}" ("${full.barangay}", "${full.municipality}", "${full.province}")`;
                 }
             },
             {
                 data: "status",
-                render (data, type, full, meta) {
+                render: (data, type, full, meta) => {
                     return data.toUpperCase();
                 }
             },
             { data: "internal_alert_level" },
             {
                 data: "event_start",
-                render (data, type, full, meta) {
+                render: (data, type, full, meta) => {
                     return moment(data).format("D MMMM YYYY, h:mm A");
                 }
             },
             {
                 data: "validity",
-                render (data, type, full, meta) {
+                render: (data, type, full, meta) => {
                     if (data == null) return "-";
-                    return moment(data).format("D MMMM YYYY, h:mm A");
+                    else return moment(data).format("D MMMM YYYY, h:mm A");
                 }
             }
         ],
@@ -72,46 +72,41 @@ $(document).ready(() => {
         lengthMenu: [10, 20, 50],
         order: [[0, "desc"]],
         rowCallback: (row, data, index) => {
-            const { status, internal_alert_level } = data;
-            let css = `alert-${status}`;
-
-            if (status === "on-going") {
-                const public_alert = internal_alert_level.substr(0, 2);
-                let alert;
-                if (public_alert === "ND") alert = 1;
-                else alert = public_alert.substr(1);
-                css = `alert-${alert}`;
+            if (data.status === "finished" || data.status === "extended") {
+                $(row).css("background-color", "rgba(0,140,0,0.7)");
+            } else if (data.status === "on-going") {
+                $(row).css("background-color", "rgba(255,0,0,0.7)");
+            } else if (data.status === "invalid") {
+                $(row).css("background-color", "rgba(90,90,90,0.7)");
             }
-
-            $(row).addClass(css);
         },
-        initComplete ({ oInstance: instance }) {
-            const column_1 = instance.api().columns([1]);
-            const $select = $("<select><option value=''>---</option></select>");
-
-            const $select_1 = $select.clone().prop("id", "site_filter");
-            $select_1.appendTo($(column_1.footer()).empty())
-            .on("change", ({ target }) => {
-                const val = $.fn.dataTable.util.escapeRegex($(target).val());
-                reloadTable(val);
-            });
-
-            $.get("/../pubrelease/getSites", (data) => {
-                data.forEach((x) => {
-                    $select_1.append(`<option value="${x.site_id}">${x.site_code.toUpperCase()} (${x.address})</option>`);
+        initComplete: () => {
+            this.api().columns([1]).every(() => {
+                var column = this;
+                var select = $("<select id='site_filter'><option value=''>---</option></select>")
+                .appendTo($(column.footer()).empty())
+                .on("change", () => {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    reloadTable(val);
                 });
-            }, "json");
-
-            const column_2 = instance.api().columns([2]);
-            const $select_2 = $select.clone().prop("id", "status_filter");
-            $select_2.appendTo($(column_2.footer()).empty())
-            .on("change", ({ target }) => {
-                const val = $.fn.dataTable.util.escapeRegex($(target).val());
-                reloadTable(val);
+                $.get("/../pubrelease/getSites", (data) => {
+                    data.forEach((x) => {
+                        select.append(`<option value="${x.site_id}">${x.site_code.toUpperCase()} (${x.address})</option>`);                   });
+                }, "json");
             });
 
-            ["on-going", "extended", "finished", "routine", "invalid"].forEach((d) => {
-                $select_2.append(`<option value="${d}">${d.toUpperCase()}</option>`);
+            this.api().columns([2]).every(() => {
+                var column = this;
+                var select = $("<select id='status_filter'><option value=''>---</option></select>")
+                .appendTo($(column.footer()).empty())
+                .on("change", () => {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    reloadTable(val);
+                });
+
+                ["on-going", "extended", "finished", "routine", "invalid"].forEach((d) => {
+                    select.append(`<option value="${d}">${d.toUpperCase()}</option>`);
+                });
             });
         }
     });

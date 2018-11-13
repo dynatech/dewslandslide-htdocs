@@ -1,36 +1,19 @@
 /****
  *
  *	Created by Kevin Dhale dela Cruz
- *	Main DYNASLOPE 2.0 Stylesheet
- * 
- *  P.S DO NOT EDIT any style in this CSS directly
- *  on the CSS file! Edit the SCSS file located on the
- *  SASS file folder and re-compile with the output path
- *  set on the current path of the dynaslope-main.css folder.
- *  
- *  ALSO, be mindful to only add GENERAL styles. Create a specific
- *  CSS or SCSS file for changes applicable only to certain pages.
+ *	CSS file for Public Website General
  *	
 ****/
 @font-face {
-  font-family: 'Open Sans Bold';
+  font-family: 'Open Sans';
   src: url("/fonts/Open Sans/OpenSans-ExtraBold.ttf");
   font-weight: bold;
   font-style: normal; }
-@font-face {
-  font-family: 'Open Sans';
-  src: url("/fonts/Open Sans/OpenSans-Regular.ttf");
-  font-weight: normal;
-  font-style: normal; }
-* {
-  font-family: 'Open Sans', sans-serif; }
-
 html, body {
   height: 100%; }
 
 #page-wrapper {
-  min-height: 67.7%;
-  padding: 40px 10px 10px; }
+  min-height: 67.7%; }
 
 #page-wrapper:after {
   content: "";
@@ -66,11 +49,9 @@ html, body {
   margin-top: 20px; }
 
 #project-name {
-  font-family: 'Open Sans Bold', sans-serif;
   font-size: 40px;
   color: #17526D;
-  line-height: 55px;
-  font-weight: 800; }
+  line-height: 55px; }
 
 #dynaslope-logo {
   /*width: 83.47px;*/
@@ -93,74 +74,38 @@ html, body {
   display: inline-block; }
 
 .nav-general-text {
+  font-family: 'Open Sans', sans-serif;
   font-size: 13px;
   font-weight: 800;
   display: inline-block;
   vertical-align: middle;
   padding-top: 14px; }
-  .nav-general-text div {
-    font-family: 'Open Sans Bold', sans-serif;
+  .nav-general-text span {
     display: block; }
 
 #navigation {
   background-color: #F8991D;
   text-align: center;
+  height: 90px;
   border-radius: 0;
-  min-width: 1200px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 10; }
-  #navigation .row {
-    margin: 0px; }
+  min-width: 1200px; }
   #navigation ul {
     white-space: nowrap;
     list-style: none;
     min-width: 1200px; }
-    #navigation ul li.dropdown {
+    #navigation ul li {
       display: inline-block;
       position: relative;
       height: 90px;
       padding: 30px 50px 0;
       font-weight: bold;
-      font-size: 20px;
-      transition: 0.2s;
-      color: #17526D; }
-      #navigation ul li.dropdown .dropdown-content {
-        display: none;
-        position: absolute;
-        top: 90px;
-        left: auto;
-        right: 0px;
-        text-align: left;
-        font-size: 14px;
-        padding: 6px 0px;
-        background-color: #F8991D;
-        min-width: 185px;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        z-index: 10;
-        transition: 0.2s; }
-        #navigation ul li.dropdown .dropdown-content a {
-          padding: 1px 20px;
-          color: #17526D;
-          text-decoration: none;
-          display: block;
-          transition: 0.2s; }
-        #navigation ul li.dropdown .dropdown-content a:hover {
-          background-color: #EEEEEE;
-          color: #F8991D; }
-      #navigation ul li.dropdown span.dropdown-header {
-        display: block;
-        padding: 3px 20px;
-        font-size: 12px;
-        line-height: 1.42857143;
-        color: #17526D;
-        white-space: nowrap; }
-    #navigation ul li:hover {
-      background-color: #ffffff;
-      color: #F8991D; }
-      #navigation ul li:hover .dropdown-content {
-        display: table; }
-    #navigation ul hr {
-      margin: 5px 0px; }
+      font-size: 20px; }
+      #navigation ul li a {
+        text-decoration: none;
+        color: #17526D; }
+      #navigation ul li a:hover {
+        text-decoration: none;
+        color: white; }
 
 .sticky {
   position: fixed;
@@ -177,10 +122,6 @@ html, body {
     font-weight: 800;
     padding-top: 22px;
     color: #17526D; }
-    .sticky span#logo a {
-      font-family: 'Open Sans Bold', sans-serif;
-      text-decoration: none;
-      color: #17526D; }
 
 .sticky-wrapper {
   padding-top: 125px !important; }
@@ -201,59 +142,20 @@ textarea {
   min-width: 100%; }
 
 #page-header {
-  font-family: 'Open Sans Bold', sans-serif;
   font-size: 25px;
   font-weight: 600;
-  text-transform: uppercase;
   color: #17526D;
   border: solid #17526D;
   border-radius: 6px;
-  margin-bottom: 40px;
-  box-sizing: border-box;
-  text-align: center;
-  display: block;
-  padding-bottom: 0px; }
-  #page-header small:before {
-    content: " ";
-    border-left: 3px solid;
-    padding-left: 7px; }
+  margin-bottom: 40px; }
 
 .panel {
   padding-bottom: 8px; }
   .panel.panel-primary {
     background-color: #17526D; }
     .panel.panel-primary .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
+      background-color: #17526D;
       border: solid #17526D; }
-  .panel.panel-info {
-    background-color: rgba(50, 187, 248, 0.5); }
-    .panel.panel-info .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
-      border: solid rgba(50, 187, 248, 0.1); }
-  .panel.panel-warning {
-    background-color: rgba(248, 153, 29, 0.7); }
-    .panel.panel-warning .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
-      border: solid rgba(248, 153, 29, 0.2); }
-  .panel.panel-danger {
-    background-color: rgba(153, 27, 30, 0.8); }
-    .panel.panel-danger .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
-      border: solid rgba(153, 27, 30, 0.1);
-      color: white; }
-      .panel.panel-danger .panel-heading small {
-        color: white !important; }
-  .panel.panel-success {
-    background-color: rgba(0, 178, 0, 0.5); }
-    .panel.panel-success .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
-      border: solid rgba(0, 178, 0, 0.1); }
-  .panel.panel-a1 {
-    background-color: rgba(252, 199, 17, 0.5); }
-    .panel.panel-a1 .panel-heading {
-      background-color: rgba(255, 255, 255, 0);
-      border: solid rgba(252, 199, 17, 0.1);
-      color: #92740b; }
   .panel .panel-heading .panel-title > a {
     display: block;
     text-decoration: none; }
@@ -269,36 +171,10 @@ textarea {
   color: #FFFFFF; }
 
 li.active > a {
-  background-color: #F8991D !important; }
+  background-color: #17526D !important; }
 
 select option:disabled {
   background-color: #EEEEEE; }
-
-.btn.btn-primary {
-  background-color: #17526D; }
-.btn.btn-success {
-  background-color: #00B200; }
-.btn.btn-warning {
-  background-color: #F8991D; }
-.btn.btn-danger {
-  background-color: #991B1E;
-  border-color: #991B1E; }
-.btn.btn-info {
-  background-color: #32BBF8;
-  border-color: #32BBF8; }
-.btn.btn-default {
-  background-color: #989898;
-  border-color: #989898;
-  color: white; }
-
-.alert.alert-danger {
-  background-color: rgba(153, 27, 30, 0.8);
-  border-color: rgba(153, 27, 30, 0.2);
-  color: white; }
-  .alert.alert-danger a {
-    color: #32BBF8; }
-.alert.alert-info {
-  background-color: #32BBF8; }
 
 .container-line {
   margin-top: 20px;
@@ -348,7 +224,7 @@ select option:disabled {
     left: calc(50% - 22px); }
   .container-line-text.timeline-head-text {
     top: -18px;
-    left: 50%; }
+    left: calc(50% - 104px); }
   .container-line-text.tab-head-text {
     top: -33px; }
   .container-line-text.section-head-text {
@@ -358,40 +234,5 @@ select option:disabled {
   font-size: 22px;
   font-weight: 600;
   padding: 0 10px; }
-
-table {
-  border: 2px solid #17526D;
-  border-radius: 4px; }
-  table thead > tr,
-  table tfoot > tr {
-    background-color: #17526D;
-    color: white; }
-  table a {
-    color: #17526D; }
-  table select {
-    color: black; }
-
-.alert-3 {
-  background-color: rgba(201, 48, 44, 0.5); }
-
-.alert-2 {
-  background-color: rgba(248, 153, 29, 0.7); }
-
-.alert-1 {
-  background-color: rgba(252, 199, 17, 0.5); }
-
-.alert-finished, .alert-extended {
-  background-color: rgba(0, 178, 0, 0.5); }
-
-.alert-invalid {
-  background-color: rgba(152, 152, 152, 0.5); }
-
-label.error {
-  font-size: 12px;
-  font-style: italic;
-  margin: 10px 0 0 10px; }
-
-#loading .modal-body {
-  padding: 15px 15px 0; }
 
 /*# sourceMappingURL=dynaslope-main.css.map */

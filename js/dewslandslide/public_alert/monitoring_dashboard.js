@@ -163,7 +163,7 @@ function buildDashboardTables (socket_data) {
                 const { internal_alert_level } = data;
                 let temp = internal_alert_level.slice(0, 2);
                 if (temp === "ND") { temp = (internal_alert_level.length > 2) ? "A1" : "A0"; }
-                $(row).addClass(`alert-${temp.charAt(1)}`);
+                $(row).addClass(`alert_${temp.charAt(1)}`);
             },
             initComplete () {
                 let row_count = 0;

@@ -1,0 +1,25 @@
+#xz-lin-zero-analysis-dyna-canvas,
+#xy-lin-zero-analysis-dyna-canvas,
+#xz-lin-analysis-dyna-canvas,
+#xy-lin-analysis-dyna-canvas,
+#xz-vel-analysis-dyna-canvas,
+#xy-vel-analysis-dyna-canvas { 
+	width: auto;
+	height: 400px; 
+	font: 12px Arial;
+}
+
+.analysis-dyna-canvas .dygraph-legend > span.highlight { border: 1px solid grey; }
+
+.analysis-dyna-canvas .dygraph-label {
+	/* This applies to the title, x-axis label and y-axis label */
+	font-family: 'Lato', sans-serif;
+}
+.analysis-dyna-canvas .dygraph-title {
+	/* This rule only applies to the chart title */
+	font-family: 'Droid Serif', serif;  /* color, delta-x, delta-y, blur radius */
+}
+.analysis-dyna-canvas .dygraph-ylabel {
+	/* This rule only applies to the y-axis label */
+	font-family: 'Lato', sans-serif;  /* (offsets are in a rotated frame) */
+}
