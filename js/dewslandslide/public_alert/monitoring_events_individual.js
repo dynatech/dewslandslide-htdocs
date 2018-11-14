@@ -253,7 +253,7 @@ function initializeBulletinSendingAndDownloading () {
 
                 subject = $("#subject").text();
                 filename = `${$("#filename").text()}.pdf`;
-                sendMail(text, subject, filename, recipients);
+                sendMail(text, subject, filename, recipients, release_id);
             }
         });
     });

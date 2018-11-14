@@ -12,7 +12,7 @@ let on_edit = null;
 let release_id = null;
 let event_id = null;
 let original_field_values = [];
-let bulletin_timestamp = null;
+let bulletin_timestamp = null;f
 const HOSTNAME = window.location.hostname;
 let $LOADING;
 let $RESULT_MODAL;
@@ -44,7 +44,7 @@ function loadBulletin (id1, id2) {
         $("#bulletin-modal").modal({ backdrop: "static", keyboard: false, show: true });
     })
     .catch((x) => {
-        sendBulletinError(`error loading bulletin\n${x.responseText}`);
+        sendBulletinError(`error loading bulletin\n${x.responseText}`, release_id);
         showErrorModal(x, "loading bulletin");
     });
 }
@@ -190,8 +190,8 @@ function sendBulletinAccuracyReport (release_id, edited_field_values, original_f
         metric_name: "bulletin_accuracy",
         module_name: "Bulletin",
         report_message: remarks_str,
-        reference_id: "public_alert_release",
-        reference_table: "release_id"
+        reference_id: release_id,
+        reference_table: "public_alert_release"
     };
 
     PMS.send(report);
@@ -231,7 +231,7 @@ function tagBulletin (release_id, edited_field_values, original_field_values) {
     );
 }
 
-function sendMail (text, subject, filename, recipients) {
+function sendMail (text, subject, filename, recipients, release_id) {
 	$LOADING.find(".progress-bar").text("Sending EWI and Bulletin...");
 	const is_test = HOSTNAME.includes("dynaslope.phivolcs.dost") ? false : true;    const form = {
         text,
@@ -262,7 +262,9 @@ function sendMail (text, subject, filename, recipients) {
                 type: "timeliness",
                 metric_name: "bulletin_timeliness",
                 module_name: "Bulletin",
-                execution_time: exec_time
+                execution_time: exec_time,
+		reference_id: release_id,
+        	reference_table: "public_alert_release"
             };
 
             PMS.send(report);
@@ -318,12 +320,14 @@ function insertNarrative (recipients) {
     return $.post("/../../accomplishment/insertNarratives", { narratives: JSON.stringify(narratives) });
 }
 
-function sendBulletinError (message) {
+function sendBulletinError (message, release_id) {
     const report = {
         type: "error_logs",
         metric_name: "bulletin_error_logs",
         module_name: "Bulletin",
-        report_message: message
+        report_message: message,
+	reference_id: release_id,
+	reference_table: "public_alert_release"
     };
 
     PMS.send(report);

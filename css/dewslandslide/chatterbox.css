@@ -1,0 +1,358 @@
+#quick-inbox-display, #quick-unregistered-inbox-display, #quick-release-display, #quick-event-inbox-display, #group-message-display, #datalogger-inbox-display {
+    height: 555px;
+    overflow: hidden;
+    overflow-y: scroll;
+    list-style-type: none;
+    margin-top: 5px;
+    padding: 0;
+    margin-bottom: 0px;
+}
+
+.friend-list li {
+    border: 0.5px solid #17526c7a;
+}
+
+.friend-list li a {
+    position: relative;
+    display: block;
+    padding: 10px;
+    transition: all .2s ease;
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -ms-transition: all .2s ease;
+    -o-transition: all .2s ease;
+}
+
+.friend-list li a img {
+    float: left;
+    width: 45px;
+    height: 45px;
+    margin-right: 0px;
+}
+
+.friend-list li a .friend-name, .friend-list li a .friend-name:hover {
+    color: #777;
+}
+
+.friend-list li a .last-message {
+    width: 70%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.friend-list li a .time {
+    position: absolute;
+    top: 0px;
+    right: 8px;
+}
+
+.tagged {
+  border-color: #f8981d;
+  border-style: solid;
+  border-width: 10px;
+  background-color: #f8971d;
+}
+
+.chat {
+  margin-left: 0px;
+  margin-right: 15px;
+  padding-left: 0px;
+}
+
+.chat-message {
+  overflow: hidden;
+  overflow-y: scroll;
+  margin-bottom: 5px;
+}
+
+.chat-message ul {
+  list-style-type: none;
+}
+
+.chat li.left .chat-body {
+  margin-left: 70px;
+  background-color: #fff;
+}
+
+.chat li .chat-body {
+  position: relative;
+  font-size: 11px;
+  padding: 10px;
+  border: 4px solid #17526c;
+  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
+.chat li .chat-body .header {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f1f5fc;
+}
+
+.chat li .chat-body p {
+  margin: 0;
+  font-size: 11px;
+}
+
+hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+p {
+    text-indent: 0px;
+}
+
+.chat li.left .chat-body:before {
+  position: absolute;
+  top: 10px;
+  left: -11px;
+  display: inline-block;
+  background: #fff;
+  width: 16px;
+  height: 16px;
+  border-top: 4px solid #17526c;
+  border-left: 4px solid #17526c;
+  content: '';
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+}
+
+.chat li.right .chat-body:before {
+  position: absolute;
+  top: 10px;
+  right: -11px;
+  display: inline-block;
+  background: #fff;
+  width: 16px;
+  height: 16px;
+  border-top: 4px solid #17526c;
+  border-right: 4px solid #17526c;
+  content: '';
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+}
+
+.chat li {
+  margin: 15px 0;
+}
+
+.chat li.right .chat-body {
+  margin-right: 70px;
+  background-color: #fff;
+}
+
+.chat li img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50em;
+  -moz-border-radius: 50em;
+  -webkit-border-radius: 50em;
+}
+
+.right-content {
+    text-align: right;
+}
+
+p {
+    padding: 10px 15px 0px 15px;
+}
+
+#modal-select-recipients {
+    padding-left: 15px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  margin-left: 10%;
+  transform: translate3d(-50%, -50%, 0);
+}
+.dot {
+  width: 24px;
+  height: 24px;
+  background: #dc8b11 !important;;
+  border-radius: 100%;
+  display: inline-block;
+  animation: slide 1s infinite;
+}
+.dot:nth-child(1) {
+  animation-delay: 0.1s;
+  background: white;
+  border-color: #305479;
+  border-style: solid;
+}
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+  background: white;
+  border-color: #305479;
+  border-style: solid;
+}
+.dot:nth-child(3) {
+  animation-delay: 0.3s;
+  background: white;
+  border-color: #305479;
+  border-style: solid;
+}
+.dot:nth-child(4) {
+  animation-delay: 0.4s;
+  background: white;
+  border-color: #305479;
+  border-style: solid;
+}
+.dot:nth-child(5) {
+  animation-delay: 0.5s;
+  background: white;
+  border-color: #305479;
+  border-style: solid;
+}
+@-moz-keyframes slide {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@-webkit-keyframes slide {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@-o-keyframes slide {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes slide {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.routine-site-selection label {
+    margin: 5px;
+}
+/*loader*/
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 27px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #f8981d;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 6px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 6px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 26px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 45px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(19px, 0);
+  }
+}
+
+/*loader*/
+
+div.awesomplete {
+    width: 100%;
+}
+
+div.awesomplete > ul {
+    margin-top: 50px;
+}
+
+.dropdown-input {
+    margin-top: 5px;
+}
+
+.bootstrap-tagsinput {
+    width: 100% !important;
+    display: block;
+    border-bottom-right-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+    line-height: 24px !important;
+}
+
+.input-group .form-control {
+    z-index: 0;
+}
+
+.input-group-btn:last-child > .btn, .input-group-btn:last-child > .btn-group {
+    z-index: 0;
+}

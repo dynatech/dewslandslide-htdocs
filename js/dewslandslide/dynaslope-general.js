@@ -20,6 +20,9 @@ $(document).ready(() => {
             }
         });
     })(jQuery, undefined);
+    
+    // Instantiate All Dropdown Instances
+    $(".dropdown-toggle").dropdown();
 
     $("body").on("hide.bs.collapse", ".panel", ({ target }) => {
         $(target).css("padding-bottom", 0);

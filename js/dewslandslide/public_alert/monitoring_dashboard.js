@@ -830,7 +830,9 @@ function insertEventRelease (data) {
             type: "timeliness",
             metric_name: "web_ewi_timeliness",
             module_name: "Web EWI Release",
-            execution_time: exec_time
+            execution_time: exec_time,
+            reference_id: 0,
+            reference_table: "public_alert_release"
         };
 
         PMS.send(report);
@@ -846,7 +848,9 @@ function insertEventRelease (data) {
             type: "error_logs",
             metric_name: "web_ewi_error_logs",
             module_name: "Web EWI Release",
-            report_message: `error inserting release ${x.responseText}`
+            report_message: `error inserting release ${x.responseText}`,
+            reference_table: "none",
+            reference_id: 0
         };
 
         PMS.send(report);
@@ -888,7 +892,7 @@ function initializeSendBulletin () {
 
                 const subject = $("#subject").text();
                 const filename = `${$("#filename").text()}.pdf`;
-                sendMail(text, subject, filename, recipients);
+                sendMail(text, subject, filename, recipients, release_id);
             }
         });
     });
