@@ -327,19 +327,21 @@ $(document).ready(function(e) {
 		.done(function(response) {
 			try{
 				let result = JSON.parse(response);
+		
+				let filtered_by_resolution = filterJsonObj(result,obj_filter);
+				let series_data_reliability = getSeriesdata(filtered_by_resolution,result,obj_filter);
+				highChartbuilderReliability(data, series_data_reliability)
+
+				let filtered_by_four = filterJsonObj(result,obj_filter,by_four=true);
+				let series_data_average = getSeriesdatainAvg(filtered_by_four);
+				highChartbuilderAverage(data, series_data_average)
+				
 			}catch(err){
 
 				alert('Error loading the data')
 				$("#response_tracker-loader-modal").modal("hide");
 				
 			}
-			let filtered_by_resolution = filterJsonObj(result,obj_filter);
-			let series_data_reliability = getSeriesdata(filtered_by_resolution,result,obj_filter);
-			highChartbuilderReliability(data, series_data_reliability)
-
-			let filtered_by_four = filterJsonObj(result,obj_filter,by_four=true);
-			let series_data_average = getSeriesdatainAvg(filtered_by_four);
-			highChartbuilderAverage(data, series_data_average)
 
 		});
 	}
