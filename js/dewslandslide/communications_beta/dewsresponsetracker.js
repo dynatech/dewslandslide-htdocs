@@ -1,14 +1,11 @@
-
-
 $(document).ready(function(e) {
 
 	dateTimepicker()
 	validateInput()
 	selectCategory()
 
-
+	// Date time picker configuration
 	function dateTimepicker(){
-
 		$('#from-date').datetimepicker({
 			format: 'YYYY-MM-DD'
 		});
@@ -18,9 +15,10 @@ $(document).ready(function(e) {
 		});
 
 	}
+ 
 
+	// Validate all inputs in the form
 	function validateInput(){
-
 		$('#confirm-filter-btn').click(function(){
 			$('#response_tracker-loader-modal').modal({backdrop: 'static', keyboard: false});
 			let filter_data = {}
@@ -58,20 +56,21 @@ $(document).ready(function(e) {
 					data['firstname'] = name[1]
 				}
 
-				let graph = processgraph(data,filter_by)
-				if (graph){
-					$("#response_tracker-loader-modal").modal("hide");
-				}else{
-					alert('Error')
-				}
+				// let graph = 
+				processgraph(data,filter_by)
+				// if (graph){
+				// 	$("#response_tracker-loader-modal").modal("hide");
+				// }else{
+				// 	alert('Error')
+				// }
 			}
-			
 
 		});
 	}
 
-	function selectCategory(){
 
+	// Selection category properties
+	function selectCategory(){
 		$('#category-selection').change(function() {
 			$("#confirm-filter-btn").prop('disabled', false);
 			if ($( this ).val() == "allsites"){
@@ -96,6 +95,8 @@ $(document).ready(function(e) {
 
 	}
 
+
+	// Input prediction on filter-key for persons name
 	function datalistPredictionPerson(data) {
 		let recon_data = [];
 		$('#filter-key').val("");
@@ -111,6 +112,7 @@ $(document).ready(function(e) {
 	}
 
 
+	// Input prediction on filter-key for site name
 	function datalistPredictionSite(data) {
 		$('#filter-key').val("");
 		$("#filter-key").autocomplete({
@@ -118,6 +120,8 @@ $(document).ready(function(e) {
 		});
 	}
 
+
+    // Date checker 
 	function dateChecker(){
 		let data = {}
 		if ($('#from-date').val() != "" && $('#to-date').val() != ""){
@@ -137,6 +141,8 @@ $(document).ready(function(e) {
 		}
 	}
 
+
+	// Convert minutes to  worded time
 	function timeConvert(n) {
 		const num = n;
 		const hours = (num / 60);
@@ -146,6 +152,8 @@ $(document).ready(function(e) {
 		return Math.abs(rhours) + " hour(s) and " + Math.abs(rminutes) + " minute(s).";
 	}
 
+
+    // Delete Nan, undefined and Empty value in a array
 	function delete_none_array(array) {
 		let index = -1,
 		arr_length = array ? array.length : 0,
@@ -163,6 +171,8 @@ $(document).ready(function(e) {
 		return result;
 	}
 
+
+	// Regroup all object to a specific column and compute time difference from timestamp
 	function setGrouponJSON(data,group_by,set_time_diff=false){
 		let categories = {}
 		let reformat_output = []
@@ -200,6 +210,8 @@ $(document).ready(function(e) {
 		return ordered
 	}
 
+
+	// Object filtering for  resolution and for four hours data
 	function filterJsonObj(data,column_name,by_four=false){
 		let filter_by_site = setGrouponJSON(data,column_name)
 		let resolution = $('#data-resolution').val();
@@ -221,6 +233,8 @@ $(document).ready(function(e) {
 		return by_site_resolution
 	}
 
+
+	// Process Series data that is base on the resolutin time
 	function getSeriesdata(data,result,obj_filter){
 		let series_data = [];
 		let total_response_count = 0
@@ -253,8 +267,9 @@ $(document).ready(function(e) {
 		
 		return(series_data)
 	}
+
+	// Computes the standar deviation of avgera data
 	function standardDeviation(values,avg){
-		// var avg = average(values);
 		const average = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
 		var squareDiffs = values.map(function(value){
 			var diff = value - avg;
@@ -270,6 +285,8 @@ $(document).ready(function(e) {
 
 	}
 
+
+	// Series data process for average,min and max of the array data
 	function getSeriesdatainAvg(data,all=false){
 		let series_data = [];
 		let name = []
@@ -302,14 +319,14 @@ $(document).ready(function(e) {
 		if (all){
 			return(series_data_all)
 		}else{
-			return([name,[{name:'Minutes',data:series_data}]])
+			return([name,[{name:'Minutes',colorByPoint: true,data:series_data}]])
 		}
 
 		
 	}
 
 
-
+	// Process all inputs and creates the highchart graphs
 	function processgraph(data,obj_filter){
 	$.post( "../responsetracker/analytics", {input: JSON.stringify(data)})
 		.done(function(response) {
@@ -328,6 +345,8 @@ $(document).ready(function(e) {
 
 	}
 
+
+	// Highchart Builder for reliability graph
 	function highChartbuilderReliability(data, series_data){
 		let title;
 		if ( data['category'] == 'allsites'){
@@ -337,7 +356,8 @@ $(document).ready(function(e) {
 		}else{
 			title = $('#filter-key').val()
 		}
-		$('#reliability-chart-container').highcharts({
+
+		let chart = $('#reliability-chart-container').highcharts({
 			chart: {
 				zoomType: 'x',
 				type: 'column'
@@ -394,8 +414,14 @@ $(document).ready(function(e) {
 			    series: series_data
 			});
 
+		setTimeout(() => {
+			$("#response_tracker-loader-modal").modal("hide");
+		}, 2000)
+
 	}
 
+
+	// Highchart Builder for Average Delay time graph
 	function highChartbuilderAverage(data, series_data){
 		let title;
 		if ( data['category'] == 'allsites'){
