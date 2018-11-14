@@ -56,13 +56,8 @@ $(document).ready(function(e) {
 					data['firstname'] = name[1]
 				}
 
-				// let graph = 
-				processgraph(data,filter_by)
-				// if (graph){
-				// 	$("#response_tracker-loader-modal").modal("hide");
-				// }else{
-				// 	alert('Error')
-				// }
+					processgraph(data,filter_by)
+				
 			}
 
 		});
@@ -328,9 +323,16 @@ $(document).ready(function(e) {
 
 	// Process all inputs and creates the highchart graphs
 	function processgraph(data,obj_filter){
-	$.post( "../responsetracker/analytics", {input: JSON.stringify(data)})
+		$.post( "../responsetracker/analytics", {input: JSON.stringify(data)})
 		.done(function(response) {
-			let result = JSON.parse(response);
+			try{
+				let result = JSON.parse(response);
+			}catch(err){
+
+				alert('Error loading the data')
+				$("#response_tracker-loader-modal").modal("hide");
+				
+			}
 			let filtered_by_resolution = filterJsonObj(result,obj_filter);
 			let series_data_reliability = getSeriesdata(filtered_by_resolution,result,obj_filter);
 			highChartbuilderReliability(data, series_data_reliability)
@@ -338,11 +340,8 @@ $(document).ready(function(e) {
 			let filtered_by_four = filterJsonObj(result,obj_filter,by_four=true);
 			let series_data_average = getSeriesdatainAvg(filtered_by_four);
 			highChartbuilderAverage(data, series_data_average)
-			
+
 		});
-
-	return true
-
 	}
 
 
