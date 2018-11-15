@@ -360,7 +360,12 @@ function initializeGoLoadOnClick () {
 function initializeSendMessageOnClick () {
 	$("#send-msg").click(function() {
 		console.log(recipient_container);
-		sendSms(recipient_container,$("#msg").val());
+		if($.trim($("#msg").val()) == ""){
+	    	$("#chatbox-warning").show(300);
+	    }else{
+	    	$("#chatbox-warning").hide();
+			sendSms(recipient_container,$("#msg").val());
+	    }
 	});
 }
 

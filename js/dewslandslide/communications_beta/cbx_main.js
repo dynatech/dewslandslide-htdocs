@@ -145,7 +145,7 @@ function displayUnregisteredInboxMain(msg_data) {
 	try {
 		try {
 			for (let counter = 0; counter < msg_data.length; counter++) {
-				quick_inbox_unregistered.unshift(msg_data[counter]);
+				quick_inbox_unregistered.push(msg_data[counter]);
 			}
 			
 		} catch(err) {
