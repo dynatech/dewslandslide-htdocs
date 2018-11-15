@@ -326,12 +326,14 @@ function displayOrganizationSelection (orgs,user_orgs = []) {
 	}
 
 	for (var i = 0; i < orgs.length; i++) {
-		var modIndex = i % 7;
-		var org = orgs[i];
-		$("#orgs-cc-"+modIndex).append('<div class="checkbox"><label><input type="checkbox" id="id_'+org.org_name+'" name="orgs" class="form-group organization-checkbox" value="'+org.org_name+'">'+org.org_name.toUpperCase()+'</label></div>');
+		let modIndex = i % 7;
+		let org = orgs[i];
+		let formatted_office_id = org.org_name.replace(": ", "_");
+		$("#orgs-cc-"+modIndex).append('<div class="checkbox"><label><input type="checkbox" id="id_'+formatted_office_id+'" name="orgs" class="form-group organization-checkbox" value="'+org.org_name+'">'+org.org_name.toUpperCase()+'</label></div>');
 		for (var counter = 0; counter < user_orgs.length; counter++) {
 			if (user_orgs[counter].org_name.toUpperCase() == org.org_name.toUpperCase()) {
-				$("#orgs-cc-"+modIndex).find(".checkbox").find("#id_"+org.org_name).prop('checked',true);
+				let formatted_office_value = org.org_name.replace(": ", "_");
+				$("#orgs-cc-"+modIndex).find(".checkbox").find("#id_"+formatted_office_value).prop('checked',true);
 			}
 		}
 	}
