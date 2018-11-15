@@ -38,6 +38,7 @@ function connectWS() {
 					break;
 				case "smsloadunregisteredinbox":
 					displayUnregisteredInboxMain(msg_data.data);
+					// displayDataTableUnregisteredContacts(msg_data.data);
 					break;
 				case "latestAlerts":
 					initLoadLatestAlerts(msg_data.data);
@@ -49,6 +50,7 @@ function connectWS() {
 					displayDataTableEmployeeContacts(msg_data.data);
 					break;
 				case "loadSmsConversation":
+					console.log(msg_data);
 					displayConversationPanel(msg_data.data,msg_data.full_name,msg_data.recipients,msg_data.titles);
 					$('#chatterbox-loader-modal').modal("hide");
 					break;
@@ -106,6 +108,8 @@ function connectWS() {
 					displayRoutineTemplate(msg_data.data);
 					break;
 				case "fetchedSmsTags":
+					console.log(msg_data);
+					displaySitesToTag(msg_data.sites);
 					displayConversationTags(msg_data.data);
 					break;
 				case "fetchAlertStatus":
@@ -146,6 +150,7 @@ function connectWS() {
 					displayConversationTaggingStatus(msg_data.status);
 					break;
 				case "fetchGndMeasReminderSettings":
+					console.log(msg_data);
 		            if (msg_data.saved == true) {
 		                reconstructSavedSettingsForGndMeasReminder(msg_data.save_settings,msg_data.event_sites, msg_data.extended_sites, msg_data.routine_sites, msg_data);
 		                
@@ -161,6 +166,10 @@ function connectWS() {
 					break;
 				case "fetchedSamarSites":
 					samar_sites_details = msg_data.data;
+					break;
+				case "loadOldSmsConversation":
+					$('#chatterbox-loader-modal').modal("hide");
+					displayConversationPanel(msg_data.data,msg_data.full_name,msg_data.recipients,msg_data.titles,isOld = true);
 					break;
 				default:
 					console.log("No request to load.");

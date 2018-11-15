@@ -117,18 +117,18 @@ function processEntriesWithAlerts (with_alerts, merged_arr, invalids) {
                         default: trigger_letter = "Z"; break;
                     }
 
-                    let isPresentOnInternalAlert = false;
+                    let isPresentOnProposedInternalAlert = false;
                     let isRpresent = false;
                     let isSpresent = -1;
                     if (alertIndex > -1) {
                         const { internal_alert_level } = merged_arr[alertIndex];
                         const temp = new RegExp(trigger_letter, "i");
-                        isPresentOnInternalAlert = internal_alert_level.search(temp);
+                        isPresentOnProposedInternalAlert = internal_alert.search(temp);
                         isRpresent = internal_alert_level.includes("R");
                         isSpresent = internal_alert_level.search(/s/i);
                     }
 
-                    if (alertIndex === -1 || isPresentOnInternalAlert > -1) {
+                    if (alertIndex === -1 || isPresentOnProposedInternalAlert > -1) {
                         let return_obj = null;
                         if (source === "subsurface") {
                             // Check if alert exists on database already
@@ -241,7 +241,7 @@ function adjustAlertLevelIfInvalidSensor (public_alert, entry) {
     }
 
     const obj = {
-        alert: public_alert_level,
+        public_alert: public_alert_level,
         internal_alert: internal_alert_level,
         invalid_index
     };

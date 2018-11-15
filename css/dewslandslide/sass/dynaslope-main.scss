@@ -1,0 +1,591 @@
+
+/****
+ *
+ *	Created by Kevin Dhale dela Cruz
+ *	Main DYNASLOPE 2.0 Stylesheet
+ * 
+ *  P.S DO NOT EDIT any style in this CSS directly
+ *  on the CSS file! Edit the SCSS file located on the
+ *  SASS file folder and re-compile with the output path
+ *  set on the current path of the dynaslope-main.css folder.
+ *  
+ *  ALSO, be mindful to only add GENERAL styles. Create a specific
+ *  CSS or SCSS file for changes applicable only to certain pages.
+ *	
+****/
+
+@import "variables";
+
+@font-face {
+    font-family: 'Open Sans Bold';
+    src:    url('/fonts/Open Sans/OpenSans-ExtraBold.ttf');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src:    url('/fonts/Open Sans/OpenSans-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* { font-family: 'Open Sans', sans-serif;  }
+
+html, body {
+    height: 100%;
+}
+
+#page-wrapper {
+    min-height: 67.7%;
+    padding: 40px 10px 10px;
+}
+
+#page-wrapper:after {
+    content: "";
+    display: block;
+}
+
+.footer {
+    .navbar {
+    	min-height: 60px;
+        min-width: 1200px;
+    	margin-bottom: 0;
+    	border-radius: 0;
+    	border: solid $primary-blue;
+    	background-color: $primary-blue;
+    }
+
+    $a-tags: "a, a:active, a:hover, a:visited";
+    $a-tags-hover: "a:active, a:hover";
+ 
+    #{$a-tags} {
+      color: white;
+      text-decoration: none;
+    }
+
+    #{$a-tags-hover} {
+      color: $primary-orange;
+    }
+}
+
+.row-padding {
+    padding-left: 10%;
+    padding-right: 10%;
+    font-size: 125%;
+}
+
+.container {
+    min-width: 1200px !important;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+#header-row {
+    margin-top: 20px;
+}
+
+#project-name {
+    font-family: 'Open Sans Bold', sans-serif;
+    font-size: 40px;
+    color: $primary-blue;
+    line-height: 55px;
+    font-weight: 800;
+
+}
+
+#dynaslope-logo {
+    /*width: 83.47px;*/ /*73.65px;*/
+    /*height: 65.79px;*/ /*58.05px;*/
+    width: 73px;
+    height: 73px;
+    margin: 0 13px 0 0;
+    margin-top: 2px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+#dost-phivolcs-logo {
+    width: 75px;
+    height: 75px;
+    margin: 0 0 0 10px;
+    margin-top: 2px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.nav-general-text {
+    font-size: 13px;
+    font-weight: 800;
+    display: inline-block;
+    vertical-align: middle;
+    padding-top: 14px;
+
+    div {
+        font-family: 'Open Sans Bold', sans-serif;
+        display: block;
+    }
+}
+
+#navigation {
+    background-color: $primary-orange;
+    text-align: center;
+    // height: 90px;
+    border-radius: 0;
+    min-width: 1200px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+
+    .row { margin: 0px; }
+
+    ul {
+        white-space: nowrap;
+        list-style: none;
+        min-width: 1200px;
+
+        li.dropdown {
+            display: inline-block;
+            position: relative;
+            height: 90px;
+            padding: 30px 50px 0;
+            font-weight: bold;
+            font-size: 20px;
+            transition: 0.2s;
+            color: $primary-blue;
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                top: 90px;
+                left: auto;
+                right: 0px;
+                text-align: left;
+                font-size: 14px;
+                padding: 6px 0px;
+                background-color: $primary-orange;
+                min-width: 185px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 10;
+                transition: 0.2s;
+
+                a {
+                    padding: 1px 20px;
+                    color: $primary-blue;
+                    text-decoration: none;
+                    display: block;
+                    transition: 0.2s;
+                }
+
+                a:hover {
+                    background-color: #EEEEEE;
+                    color: $primary-orange;
+                }
+            }
+
+            span.dropdown-header {
+                display: block;
+                padding: 3px 20px;
+                font-size: 12px;
+                line-height: 1.42857143;
+                color: $primary-blue;
+                white-space: nowrap;
+            }
+        }
+
+        li:hover {
+            background-color: #ffffff;
+            color: $primary-orange;
+            
+            .dropdown-content { display: table; }
+        }
+
+        hr {
+            margin: 5px 0px;
+        }
+    }
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+    white-space: nowrap;
+
+    & li {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    & span#logo {
+        text-align: right;
+        font-size: 30px;
+        font-weight: 800;
+        padding-top: 22px;
+        color: $primary-blue;
+
+        a {
+            font-family: 'Open Sans Bold', sans-serif;
+            text-decoration: none;
+            color: $primary-blue;
+        }
+    }
+}
+
+.sticky-wrapper {
+    padding-top: 125px !important;
+}
+
+.active-tab-nav {
+    background-color: $primary-blue;
+
+    a {
+        text-decoration: none;
+        color: white !important;
+    }
+}
+
+p {
+    text-align: justify;
+    text-indent: 40px;
+    font-size: 16px;
+}
+
+textarea {
+    max-width: 100%;
+    min-width: 100%;    
+}
+
+//=====
+// 
+// Page Header
+//
+//=====
+
+    #page-header {
+        font-family: 'Open Sans Bold', sans-serif;
+        font-size: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: $primary-blue;
+        border: solid $primary-blue;
+        border-radius: 6px;
+        margin-bottom: 40px;
+
+        box-sizing: border-box;
+        text-align: center;
+        display: block;
+        padding-bottom: 0px;
+
+        small:before {
+            content: " ";
+            border-left: 3px solid;
+            padding-left: 7px;
+        }
+    }
+
+// ===== END OF Page Header
+
+//=====
+// 
+// Panel CSS
+//
+//=====
+
+    .panel {
+        // border-radius: 0px !important;
+        padding-bottom: 8px;
+
+        &.panel-primary {
+            background-color: $primary-blue;
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid $primary-blue;
+            }
+        }
+
+        &.panel-info {
+            background-color: rgba($secondary-blue, 0.5);
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid rgba($secondary-blue, 0.1);
+            }
+        }
+
+        &.panel-warning {
+            background-color: rgba($primary-orange, 0.7);
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid rgba($primary-orange, 0.2);
+            }
+        }
+
+        &.panel-danger {
+            background-color: rgba($primary-red, 0.8);
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid rgba($primary-red, 0.1);
+                color: white;
+                
+                small { color: white !important; }
+            }
+        }
+
+        &.panel-success {
+            background-color: rgba($secondary-green, 0.5);
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid rgba($secondary-green, 0.1);
+            }
+        }
+
+        &.panel-a1 {
+            background-color: rgba($secondary-yellow, 0.5);
+
+            .panel-heading {
+                background-color: rgba(white, 0);
+                border: solid rgba($secondary-yellow, 0.1);
+                color: rgb(146, 116, 11);
+            }
+        }
+        
+        .panel-heading {
+           .panel-title > a {
+                display: block;
+                text-decoration: none;
+            }
+        }
+
+        .panel-body {
+            background-color: #ffffff;
+        }
+
+        .panel-collapse {
+            & > .panel-body {
+                font-size: 14px;
+            }
+        }
+    }
+
+    .modal {
+        .modal-header {
+            border-top-right-radius: 6px;
+            border-top-left-radius: 6px;
+            background-color: $primary-orange;
+            color: #FFFFFF;
+        }
+    }
+
+    li.active {
+        & > a { 
+            background-color: $primary-orange !important; 
+        }
+    }
+
+    select {
+        option:disabled { background-color: #EEEEEE; }
+    }
+
+    .btn {
+        &.btn-primary {
+            background-color: $primary-blue;
+        }
+
+        &.btn-success {
+            background-color: $secondary-green;
+        }
+
+        &.btn-warning {
+            background-color: $primary-orange;
+        }
+
+        &.btn-danger {
+            background-color: $primary-red;
+            border-color: $primary-red;
+        }
+
+        &.btn-info {
+            background-color: $secondary-blue;
+            border-color: $secondary-blue;
+        }
+
+        &.btn-default {
+            background-color: $secondary-grey;
+            border-color: $secondary-grey;
+            color: white;
+        }
+    }
+
+    .alert {
+        &.alert-danger {
+            background-color: rgba($primary-red, 0.8);
+            border-color: rgba($primary-red, 0.2);
+            color: white;
+
+            a {
+                color: $secondary-blue;
+            }
+        }
+
+        &.alert-info {
+            background-color: $secondary-blue;
+        }
+    }
+
+// ===== END OF Panel CSS
+
+//=====
+// 
+// Line Divs and Section Divs of other tabs 
+//
+//=====
+
+    .container-line {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        height: 3px;
+        background-color: $primary-blue;
+        position: relative;
+
+        &.timeline-head {
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        &.tab-head {
+            margin-top: 30px;
+            margin-bottom: 60px;
+        }
+
+        &.section-head {
+            margin-top: 50px;
+            margin-bottom: 60px;
+        }
+    }
+
+    .circle {
+        display: inline-block;
+        vertical-align: middle;
+        width: 15px;
+        height: 15px;
+        background-color: $primary-blue;;
+        border: solid 1px $primary-blue;
+        border-radius: 50%;
+        position: absolute;
+        top: -6px;
+    }
+
+    .left { left: 0; }
+    .right { right: 0; }
+
+    .container-line-text {
+        display: inline-block;
+        vertical-align: middle;
+        color: $primary-blue;
+        border: solid 3px $primary-blue;
+        border-radius: 6px;
+        position: absolute;
+        background-color: white;
+
+        &.year {
+            font-size: 14px;
+            padding: 0 5px;
+            top: -13px;
+            left: calc(50% - 22px);
+        }
+
+        &.timeline-head-text {
+            @extend .base-section-div-text;
+            top: -18px;
+            left: 50%;
+        }
+
+        &.tab-head-text {
+            @extend .base-section-div-text;
+            top: -33px;
+            // left: computed on javascript
+        }
+
+        &.section-head-text {
+            @extend .base-section-div-text;
+            top: -18px;
+            // left: computed on javascript
+        }
+    }
+
+    .base-section-div-text {
+        font-size: 22px;
+        font-weight: 600;
+        padding: 0 10px;
+    }
+
+//===== END OF Line Divs
+
+//=====
+// 
+// Datatables Related CSS
+//
+//=====
+
+    table {
+        border: 2px solid $primary-blue;
+        border-radius: 4px;
+
+        thead > tr, 
+        tfoot > tr {
+            background-color: $primary-blue;
+            color: white;
+        }
+
+        a { color: $primary-blue; }
+
+        select {
+            color: black;
+        }
+    }
+
+//===== END OF Datatables Related CSS 
+
+//=====
+// 
+// Monitoring Alert Related Styles 
+//
+//=====
+
+    .alert-3 {
+        background-color: rgba($secondary-red, 0.5);
+    }
+
+    .alert-2 {
+        background-color: rgba($primary-orange, 0.7);
+    }
+
+    .alert-1 {
+        background-color: rgba($secondary-yellow, 0.5);
+    }
+
+    .alert-finished, .alert-extended {
+        background-color: rgba($secondary-green, 0.5);
+    }
+
+    .alert-invalid {
+        background-color: rgba($secondary-grey, 0.5);
+    }
+
+//===== END OF Monitoring Alert Related Styles 
+
+label.error {
+    font-size: 12px;
+    font-style: italic;
+    margin: 10px 0 0 10px;
+}
+
+#loading .modal-body { padding: 15px 15px 0; }

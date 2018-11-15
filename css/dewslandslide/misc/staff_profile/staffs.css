@@ -1,0 +1,40 @@
+.nav-margin  {
+	margin-top: 5%;
+}
+
+.staff-profile {
+	text-align: center;
+    padding: 25px 15px 20px;
+}
+
+.staff-profile img{
+	max-width: 150px;
+	max-height: 150px;
+	width: 150px;
+	height: 150px;
+	margin: auto;
+	border: 4px solid #1f526c;
+    border-radius: 75px;
+}
+
+.staff-name {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.staff-attainment {
+	font-size: 10px;
+}
+
+.staff-position {
+	font-size: 13px;
+}
+
+img {
+    height: 150px;
+    width: 150px;
+}
+
+.container-line-text {
+	left: calc(50% - 68px) !important;
+}

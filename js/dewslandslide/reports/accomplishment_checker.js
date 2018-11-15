@@ -4,11 +4,10 @@
  *  Created by Kevin Dhale dela Cruz
  *  JS file for Monitoring Shift Checker [reports/accomplishment_checker.php]
  *  [host]/reports/accomplishment/checker
- *  
+ *
 ****/
 
-$(document).ready(function (a) {
-
+$(document).ready((a) => {
     $('.datetime').datetimepicker({
         format: 'YYYY-MM-DD HH:30:00',
         allowInputToggle: true,
@@ -17,16 +16,16 @@ $(document).ready(function (a) {
             vertical: 'bottom'
         },
     })
-    .on('dp.hide', function (e) {
+    .on('dp.hide', (e) => {
         $("#shift_end").val( moment(e.date).add(13, "hours").format("YYYY-MM-DD HH:30:00") );
     });
 
-    function checkTimestamp(value, element) 
+    function checkTimestamp(value, element)
     {
         var hour = moment(value).hour();
         var minute = moment(value).minute();
-            
-        if(element.id == 'shift_start')
+
+        if (element.id === 'shift_start')
         {
             message = "Acceptable times of shift start are 07:30 and 19:30 only.";
             var temp = moment(value).add(13, 'hours')
@@ -140,7 +139,7 @@ $(document).ready(function (a) {
                     grouped_by_site.forEach(function (group) 
                     {   
                         let length = group.length;
-                        let str = '<tr><td class="col-sm-4 text-center v-middle" rowspan="' + length + '"><strong>' + group[0].name.toUpperCase() + '</strong></td>';
+                        let str = '<tr><td class="col-sm-4 text-center v-middle" rowspan="' + length + '"><strong>' + group[0].site_code.toUpperCase() + '</strong></td>';
 
                         for ( let i = 0; i < length; i++ )
                         {

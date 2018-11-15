@@ -13,10 +13,10 @@ $(document).ready(function() {
 		$('#quick-inbox-display').css({"height": division_height-158});
 		$('#quick-inbox-unknown-display').css({"height": division_height-158});
 		$('#quick-event-inbox-display').css({"height": division_height-158});
-		$('#quick-release-display').css({"height": division_height-262});
+		$('#quick-release-display').css({"height": division_height-79});
 		$('#group-message-display').css({"height": division_height-272});
-		$('.chat-message').css({"height": division_height-308});
-		$('.activity-body').css({"height": division_height-70});
+		$('.chat-message').css({"height": division_height-280});
+		$('.activity-body').css({"height": division_height-33});
 	}
 
 	function chatterboxLoader () {

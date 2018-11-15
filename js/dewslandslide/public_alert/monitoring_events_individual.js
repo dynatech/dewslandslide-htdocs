@@ -253,7 +253,7 @@ function initializeBulletinSendingAndDownloading () {
 
                 subject = $("#subject").text();
                 filename = `${$("#filename").text()}.pdf`;
-                sendMail(text, subject, filename, recipients);
+                sendMail(text, subject, filename, recipients, release_id);
             }
         });
     });
@@ -404,6 +404,7 @@ function initializeEventDetailsOnLoad (...args) {
     const ids = ["#site-code", "#address", "#event_timeframe"];
     ids.forEach((id, index) => {
         $(id).text(args[index]);
+        recenterTimelineHeadText();
     });
 }
 

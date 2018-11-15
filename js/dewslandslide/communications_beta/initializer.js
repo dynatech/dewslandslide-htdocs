@@ -2,6 +2,11 @@ let recipient_container = [];
 let recent_contacts_collection = [];
 let recent_sites_collection = [];
 let samar_sites_details = [];
+let last_outbox_ts = null;
+let last_inbox_ts = null;
+
+let message_position = null;
+
 $(document).ready(function() {
 	$('#chatterbox-loader-modal').modal({backdrop: 'static', keyboard: false});
 	// $('#ground-meas-reminder-modal').modal({backdrop: 'static', keyboard: false});
@@ -19,7 +24,7 @@ $(document).ready(function() {
 
 function initialize() {
     setTimeout(function() {
-        initializeOnClickGetRoutineReminder();
+        // initializeOnClickGetRoutineReminder();
         initializeQuickInboxMessages();
         initializeDatepickers();
         getRecentActivity();
@@ -42,9 +47,14 @@ function initialize() {
                 initializeMiscButtons();
                 getQuickGroupSelection();
                 initializeSamarSites();
+                initializeScrollOldMessages();
                 $("#chatterbox-loader-modal").modal("hide");
+                // $("#recent-activity-panel").removeClass("blink");
+                // $("#messages-panel").removeClass("blink");
             } catch (err) {
                 $("#chatterbox-loader-modal").modal("hide");
+                // $("#recent-activity-panel").removeClass("blink");
+                // $("#messages-panel").removeClass("blink");
                 console.log(err.message);
                 // Add PMS HERE.
             }
@@ -96,6 +106,9 @@ function initializeGoChatOnClick (awesomplete) {
             conversation_details = prepareConversationDetails(multiple_contact);
             startConversation(conversation_details);            
         }
+        $("#recent-activity-panel").hide(400);
+        $("#quick-access-panel").hide(400);
+        $("#conversation-panel").show(400)
     });
 }
 
@@ -186,6 +199,7 @@ function initializeQuickInboxMessages () {
 	getQuickInboxEvent();
 	getQuickInboxUnregistered();
 	getQuickInboxDataLogger();
+    $("#inbox-loader").hide();
 }
 
 function getQuickInboxMain () {
@@ -552,19 +566,19 @@ function communityContactFormValidation () {
 
 
 function recentActivityInitializer() {
-$("#routine-actual-option").on("click", function () {
+    $("#routine-actual-option").on("click", function () {
         $("#routine-reminder-option").removeClass("active");
-        $("#routine-msg").val("");
-        $(this).addClass("active");
+        // $("#routine-msg").val("");
+        // $(this).addClass("active");
         $("#def-recipients").text("Default recipients: LEWC, BLGU, MLGU");
     });
 
     $("#routine-reminder-option").on("click", function () {
         $("#routine-actual-option").removeClass("active");
         $("#def-recipients").text("Default recipients: LEWC");
-        $("#routine-msg").val("");
+        // $("#routine-msg").val("");
         // $("#routine-msg").val(routine_reminder_msg);
-        $(this).addClass("active");
+        // $(this).addClass("active");
     });
 
     $(".rv_contacts a").on("click", function () {
@@ -624,41 +638,6 @@ function getRecentActivity () {
     if (localStorage.getItem("rv_contacts") != null) {
         recent_contacts_collection = JSON.parse(localStorage.rv_contacts);
     }
-
-    // if (recent_contacts_collection.length != 0) {
-    //     division = 12 / recent_contacts_collection.length;
-    //     for (var counter = 0; counter < recent_contacts_collection.length; counter++) {
-    //         $(".rv_contacts").append(`<div class='col-md-${parseInt(division)} col-sm-${parseInt(division)} col-xs-${parseInt(division)} recent_contacts'><input name='rc_index' value = 'activity_contacts_index_${counter}' hidden><a href='#' class='clearfix'>   <img src='/images/Chatterbox/boy_avatar.png' alt='' class='img-circle'><div class='friend-name'><strong>${recent_contacts_collection[counter].data.full_name}</strong></div></a></div>`);
-    //     }
-    // } else {
-    //     $(".rv_contacts").append("<div class='col-md-12 col-sm-12 col-xs-12'><h6>No recent activities</h6></div>");
-    // }
-
-    // if (recent_sites_collection.length != 0) {
-    //     division = 12 / recent_sites_collection.length;
-    //     var rv_quick_sites = "";
-    //     var rv_quick_offices = "";
-    //     for (var counter = 0; counter < recent_sites_collection.length; counter++) {
-    //         for (var sub_counter = 0; sub_counter < recent_sites_collection[counter].organizations.length; sub_counter++) {
-    //             if (sub_counter == 0) {
-    //                 rv_quick_offices = recent_sites_collection[counter].organizations[sub_counter];
-    //             } else {
-    //                 rv_quick_offices = `${rv_quick_offices}, ${recent_sites_collection[counter].organizations[sub_counter]}`;
-    //             }
-    //         }
-
-    //         for (var sub_counter = 0; sub_counter < recent_sites_collection[counter].sitenames.length; sub_counter++) {
-    //             if (sub_counter == 0) {
-    //                 rv_quick_sites = recent_sites_collection[counter].site_code[sub_counter];
-    //             } else {
-    //                 rv_quick_sites = `${rv_quick_sites}, ${recent_sites_collection[counter].site_code[sub_counter]}`;
-    //             }
-    //         }
-    //         $(".rv_sites").append(`<div class='col-md-${parseInt(division)} col-sm-${parseInt(division)} col-xs-${parseInt(division)} recent_sites'><input name='rs_index' value = 'activity_sites_index_${counter}' hidden><a href='#' class='clearfix'><img src='/images/Chatterbox/dewsl_03.png' alt='' class='img-circle'><div class='friend-name'><strong style='text-transform: uppercase;'>Site: ${rv_quick_sites}</strong><div class='last-message text-muted'>Offices: ${rv_quick_offices}</div></div></a></div>`);
-    //     }
-    // } else {
-    //     $(".rv_sites").append("<div class='col-md-12 col-sm-12 col-xs-12'><h6>No recent activities</h6></div>");
-    // }
 }
 
 
@@ -683,12 +662,12 @@ function initializeOnClickGetRoutineReminder() {
 }
 
 function getRoutineTemplate() {
-	$("#routine-actual-option").on("click", () => {
-		let msg = {
-			type: 'getRoutineTemplate'
-		};
-		wss_connect.send(JSON.stringify(msg));
-	});
+	// $("#routine-actual-option").on("click", () => {
+	let msg = {
+		type: 'getRoutineTemplate'
+	};
+	wss_connect.send(JSON.stringify(msg));
+	// });
 }
 
 function getLatestAlert() {
@@ -713,7 +692,7 @@ function displayRoutineReminder(sites,template) {
         case "Friday":
             $("#def-recipients").css("display", "inline-block");
             $(".routine-options-container").css("display", "flex");
-            $("#send-routine-msg").css("display", "inline");
+            $("#send-routine-message").css("display", "inline");
             for (var counter = 0; counter < sites.length; counter++) {
                 if (wet[sites[counter].season - 1].includes(month)) {
                     routine_sites.push(sites[counter]);
@@ -730,13 +709,13 @@ function displayRoutineReminder(sites,template) {
             });
 
             $(".routine_section").append("<div class='routine-msg-container'></div>");
-            $(".routine-msg-container").append("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
-            $("#routine-msg").val(parsed_template);
+            // $(".routine-msg-container").append("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
+            $("#routine-reminder-message").val(parsed_template);
             break;
         case "Tuesday":
             $("#def-recipients").css("display", "inline-block");
             $(".routine-options-container").css("display", "flex");
-            $("#send-routine-msg").css("display", "inline");
+            $("#send-routine-message").css("display", "inline");
             for (var counter = 0; counter < sites.length; counter++) {
                 if (wet[sites[counter].season - 1].includes(month)) {
                     routine_sites.push(sites[counter]);
@@ -753,13 +732,13 @@ function displayRoutineReminder(sites,template) {
             });
 
             $(".routine_section").append("<div class='routine-msg-container'></div>");
-            $(".routine-msg-container").append("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
-            $("#routine-msg").val(parsed_template);
+            // $(".routine-msg-container").append("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
+            $("#routine-reminder-message").val(parsed_template);
             break;
         case "Wednesday":
             $("#def-recipients").css("display", "inline-block");
             $(".routine-options-container").css("display", "flex");
-            $("#send-routine-msg").css("display", "inline");
+            $("#send-routine-message").css("display", "inline");
             for (var counter = 0; counter < sites.length; counter++) {
                 if (dry[sites[counter].season - 1].includes(month)) {
                     routine_sites.push(sites[counter]);
@@ -776,11 +755,12 @@ function displayRoutineReminder(sites,template) {
             });
 
             $(".routine_section").append("<div class='routine-msg-container'></div>");
-            $(".routine-msg-container").prepend("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
-            $("#routine-msg").val(parsed_template);
+            // $(".routine-msg-container").prepend("<textarea class='form-control' id='routine-msg' cols='30'rows='10'></textarea>");
+            $("#routine-reminder-message").val(parsed_template);
             break;
         default:
             $(".routine_section").append("<div class='col-md-12 col-sm-12 col-xs-12'><h6>No Routine Monitoring for today.</h6></div>");
+            $("#routine-reminder-message").val(parsed_template);
             break;
     }
 
@@ -831,4 +811,37 @@ function initializeSamarSites() {
         type: "getSiteDetails"
     };
     wss_connect.send(JSON.stringify(msg));
+}
+
+function initializeScrollOldMessages() {
+    $('.chat-message').scroll(function() {
+      if ($(this).scrollTop() == 0) {
+        $('#chatterbox-loader-modal').modal({backdrop: 'static', keyboard: false});
+
+        let tag_offices = [];
+        $('input[name="orgs"]:checked').each(function() {
+            tag_offices.push($(this).val());
+        });
+
+        let tag_sites = [];
+        let site_code = [];
+        $('input[name="sitenames"]:checked').each(function() {
+            tag_sites.push($(this).val());
+            site_code.push($(this).closest('label').text());
+        });
+        tag_sites.sort();
+
+        recipient_container = recipient_container.filter(function (el) {
+          return el != null;
+        });
+
+        let msg = {
+            type: "loadOldMessages",
+            recipients: recipient_container,
+            last_outbox_ts: last_outbox_ts,
+            last_inbox_ts: last_inbox_ts
+        };
+        wss_connect.send(JSON.stringify(msg));
+      }
+    });
 }
