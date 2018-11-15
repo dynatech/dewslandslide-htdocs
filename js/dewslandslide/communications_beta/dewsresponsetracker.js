@@ -75,6 +75,7 @@ $(document).ready(function(e) {
 			}else{
 				$("#filter-key").prop('disabled', false);
 				$.get( "../responsetracker/get"+$('#category-selection').val(), function( data ) {
+					$('#filter-key').val("");
 					let dataFetched = {};
 					dataFetched = JSON.parse(data);
 					if (dataFetched.type == "person") {
@@ -84,6 +85,8 @@ $(document).ready(function(e) {
 					} else {
 						console.log('Invalid Request');
 					}
+
+
 				});
 			}
 		});
@@ -93,26 +96,20 @@ $(document).ready(function(e) {
 
 	// Input prediction on filter-key for persons name
 	function datalistPredictionPerson(data) {
+		$("#filter-key").typeahead('destroy')
 		let recon_data = [];
-		$('#filter-key').val("");
 		for (let counter=0;counter < data.length;counter++){
 			let constructedFullname = data[counter].lastname+','+ data[counter].firstname
 			+',('+ data[counter].number +')';
 			recon_data.push(constructedFullname);
 		}
-
-		$("#filter-key").autocomplete({
-			source: recon_data
-		});
+		$("#filter-key").typeahead({ source: recon_data });
 	}
 
 
-	// Input prediction on filter-key for site name
+	 //Input prediction on filter-key for site name
 	function datalistPredictionSite(data) {
-		$('#filter-key').val("");
-		$("#filter-key").autocomplete({
-			source: data
-		});
+		$("#filter-key").typeahead({ source: data });
 	}
 
 
