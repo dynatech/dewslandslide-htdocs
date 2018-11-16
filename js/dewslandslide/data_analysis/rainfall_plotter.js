@@ -1,4 +1,5 @@
-
+let RAINFALL_DATA = null;
+let RAINFALL_INPUT = null;
 const rainfall_colors = {
     "24h": "rgba(73, 105, 252, 0.9)",
     "72h": "rgba(239, 69, 50, 0.9)",
@@ -154,6 +155,8 @@ function getPlotDataForRainfall (args, isEOS = false) {
 }
 
 function plotRainfall (datalist, temp) {
+    RAINFALL_DATA = datalist;
+    RAINFALL_INPUT = temp;
     datalist.forEach((source) => {
         const { null_ranges, gauge_name } = source;
 

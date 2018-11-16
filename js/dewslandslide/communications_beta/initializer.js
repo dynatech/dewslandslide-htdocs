@@ -49,8 +49,12 @@ function initialize() {
                 initializeSamarSites();
                 initializeScrollOldMessages();
                 $("#chatterbox-loader-modal").modal("hide");
+                // $("#recent-activity-panel").removeClass("blink");
+                // $("#messages-panel").removeClass("blink");
             } catch (err) {
                 $("#chatterbox-loader-modal").modal("hide");
+                // $("#recent-activity-panel").removeClass("blink");
+                // $("#messages-panel").removeClass("blink");
                 console.log(err.message);
                 // Add PMS HERE.
             }

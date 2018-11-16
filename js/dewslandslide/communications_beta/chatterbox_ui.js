@@ -9,6 +9,8 @@ function initializeChatterboxPanelBehavior(){
 	$("#recent-activity-panel").show();
 	$("#quick-access-panel").hide();
 	$("#conversation-panel").hide();
+	// $("#recent-activity-panel").addClass("blink");
+	// $("#messages-panel").addClass("blink");
 }
 
 function initializeOnClickShowPanelButton(){
