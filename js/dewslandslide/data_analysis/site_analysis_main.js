@@ -50,7 +50,7 @@ function loadDefaultSite (site_code) {
 
 function createStickyOptionsBar () {
     $("#options-bar").stick_in_parent({
-        offset_top: 80,
+        offset_top: 110,
         bottoming: false
     });
 }
@@ -305,11 +305,10 @@ function initializeOptionsBarToggleOnClick () {
 function adjustOptionsBarOnWindowResize () {
     $(window).on("resize", () => {
         const window_h = $(window).height();
-        const page_header = $(".page-header").height();
-        const nav_top = $(".navbar-fixed-top").height();
-        const nav_bottom = $(".navbar-fixed-bottom").height();
+        const page_header = $("#page-header").height();
+        const nav_top = $("#navigation").height();
 
-        const final = window_h - page_header - nav_top - nav_bottom - 100;
+        const final = window_h - page_header - nav_top - 100;
         const is_collapsed = $("#options-bar").data("collapsed") || "false";
 
         let overflow = "hidden";

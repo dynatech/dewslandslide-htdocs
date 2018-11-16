@@ -4,6 +4,11 @@
  *  CSS file for Individual Monitoring Event Page [public_alert/monitoring_events_individual.php]
  *  [host]/public_alert/monitoring_events/[release_id]
  *  
+ *  P.S DO NOT EDIT any style in this CSS directly
+ *  on the CSS file! Edit the SCSS file located on the
+ *  SASS file folder and re-compile with the output path
+ *  set on the current path of the monitoring_timeline.css folder.
+ *  
 ****/
 #header {
   background-color: white;

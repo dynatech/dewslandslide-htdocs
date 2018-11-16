@@ -216,7 +216,23 @@ textarea {
   #page-header small:before {
     content: " ";
     border-left: 3px solid;
-    padding-left: 7px; }
+    padding-left: 6px; }
+
+/* width */
+::-webkit-scrollbar {
+  width: 15px; }
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #989898; }
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #F8991D; }
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #991B1E; }
 
 .panel {
   padding-bottom: 8px; }
@@ -281,15 +297,15 @@ select option:disabled {
 .btn.btn-warning {
   background-color: #F8991D; }
 .btn.btn-danger {
-  background-color: #991B1E;
-  border-color: #991B1E; }
+  background-color: #991B1E; }
 .btn.btn-info {
-  background-color: #32BBF8;
-  border-color: #32BBF8; }
+  background-color: #32BBF8; }
 .btn.btn-default {
   background-color: #989898;
-  border-color: #989898;
   color: white; }
+  .btn.btn-default:hover {
+    background-color: #a5a5a5;
+    color: white; }
 
 .alert.alert-danger {
   background-color: rgba(153, 27, 30, 0.8);

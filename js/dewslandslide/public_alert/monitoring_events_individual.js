@@ -671,7 +671,8 @@ function prepareEwiCard (release_data, $template, validity, event_start, status)
 
             if (trigger_type.toUpperCase() === "M") {
                 const { manifestation_info } = trigger;
-                prepareManifestationInfo([manifestation_info]); // Refactor this to remove array on manifestation info
+                const $div = prepareManifestationInfo(manifestation_info);
+                $trigger_ul.append($div);
             }
         });
     }
@@ -688,8 +689,40 @@ function prepareEwiCard (release_data, $template, validity, event_start, status)
     return $template;
 }
 
-function prepareManifestationInfo (manifestation_info) {
-    // Create manifestation info additional details
+function prepareManifestationInfo (manifestation_info_arr) {
+    const $first_ul = $("<ul>");
+
+    manifestation_info_arr.forEach((man) => {
+        const $second_ul = $("<ul>");
+        const $third_ul = $("<ul>");
+
+        const { feature_type, feature_name, op_trigger } = man;
+        const type = makeUpperCaseFirstChar(feature_type);
+        const feature_str = `Feature: ${type} ${feature_name} (M${op_trigger})`;
+        const $features = $(`<ul><li>${feature_str}</li><ul>`);
+        $first_ul.append($features);
+
+        const arr = ["narrative", "reporter", "remarks"];
+        arr.forEach((prop) => {
+            const label = makeUpperCaseFirstChar(prop);
+            const $li = $("<li>").text(`${label}: ${man[prop]}`);
+            $third_ul.append($li);
+        });
+
+        $second_ul.append($third_ul);
+        $first_ul.append($second_ul);
+    });
+
+    const [{ validator }] = manifestation_info_arr;
+    const { first_name, last_name } = STAFF_LIST.find(element => element.id === validator);
+    const $validator = $("<li>").text(`Validator: ${first_name} ${last_name}`);
+    $first_ul.children("ul").append($validator);
+
+    return $first_ul;
+}
+
+function makeUpperCaseFirstChar (word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
 function selectEwiCardQualifier (data_timestamp, validity, event_start, status) {

@@ -5,22 +5,26 @@
  *  JS file for Ratchet websocket implementation on
  *  several site pages:
  *  - Accomplishment Report
- *  
+ *
 ****/
 
-var wsUri = "ws://" + window.location.hostname + ":5070/accomplishment";
-var attributes_log;
-var websocket;
+const finalHostname = window.location.hostname.split(":");
+const wsUri = `ws://${finalHostname[0]}:5070`;
 
-let json_cache = null;
-let reconnect = 10000, isConnected = false;
+console.log("WS Hostname");
+console.log(wsUri);
 
-$(document).ready(function () {
+let websocket;
+
+const reconnect = 10000;
+let isConnected = false;
+
+$(document).ready(() => {
     $("#loading").modal("show");
     init();
 
     // AUTOMATION SCRIPTS
-    /*$("#automation-row #alert_release, #automation-row #bulletin_sending").click(function () {
+    /* $("#automation-row #alert_release, #automation-row #bulletin_sending").click(function () {
         let data = {
             "staff_name" : $("#user_name").text(),
             "staff_id" : $("#current_user_id").val()
@@ -34,20 +38,19 @@ $(document).ready(function () {
     });*/
 });
 
-
-function init() {
+function init () {
     if (browserSupportsWebSockets() === false) {
         console.log("Sorry! your web browser does not support WebSockets. Try using Google Chrome or Firefox Latest Versions");
-        return; 
+        return;
     }
 
     websocket = new WebSocket(wsUri);
 
-    websocket.onopen = function() {
-        console.log("ACCOMPLISHMENT SERVER: CONNECTION TO " + wsUri + " has been successfully established");
+    websocket.onopen = function () {
+        console.log(`ACCOMPLISHMENT SERVER: CONNECTION TO ${wsUri} has been successfully established`);
 
         isConnected = true;
-        /*doSend("sendIdentification", {"name" : $("#user_name").text(), "staff_id": $("#current_user_id").val()});*/
+        /* doSend("sendIdentification", {"name" : $("#user_name").text(), "staff_id": $("#current_user_id").val()});*/
         $("#loading").modal("hide");
 
         // if (window.timerID) {
@@ -56,94 +59,81 @@ function init() {
         // }
     };
 
-    websocket.onmessage = function(evt) {
+    websocket.onmessage = function (evt) {
         onMessage(evt);
     };
 
-    websocket.onerror = function(evt) {
+    websocket.onerror = function (evt) {
         onError(evt);
     };
 
-    websocket.onclose = function(evt) {
+    websocket.onclose = function (evt) {
         isConnected = false;
         onClose(evt);
     };
 }
 
-function onClose(evt) {
+function onClose (evt) {
     websocket.close();
     console.log("ACCOMPLISHMENT SERVER: DISCONNECTED");
-    //waitForConnection();
+    waitForConnection();
 }
 
-function onMessage(evt) {
-    let data = JSON.parse(evt.data);
-    let code = data.code;
-    let pathname = window.location.pathname;
+function onMessage (evt) {
+    const data = JSON.parse(evt.data);
+    const code = data.code;
+    const pathname = window.location.pathname;
 
-    console.log('ACCOMPLISHMENT SERVER: onMessage Event Fired');
-    console.log('RESPONSE:', data);
+    console.log("ACCOMPLISHMENT SERVER: onMessage Event Fired");
+    console.log("RESPONSE:", data);
 
-    if( code == "sendConnectionID" )
-        setConnectionID(data.connection_id);
-
+    if (code == "sendConnectionID") { setConnectionID(data.connection_id); }
 }
 
-function onError(evt) {
-    console.log('ACCOMPLISHMENT SERVER: ERROR:', evt.data);
+function onError (evt) {
+    console.log("ACCOMPLISHMENT SERVER: ERROR:", evt.data);
 }
 
-function getCurrentDate() {
+function getCurrentDate () {
     var now = new Date();
-    var datetime = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
-    datetime += ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+    var datetime = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+    datetime += ` ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
     return datetime;
 }
 
-function browserSupportsWebSockets() {
-    if ("WebSocket" in window)
-    {
+function browserSupportsWebSockets () {
+    if ("WebSocket" in window) {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
-function doSend(code, data) {
-    let x = typeof data == "undefined" ? null : data;
-    let message = {
-        code: code,
+function doSend (code, data) {
+    const x = typeof data === "undefined" ? null : data;
+    const message = {
+        code,
         data: x
-    }
-    websocket.send( JSON.stringify(message) );
-    console.log('ACCOMPLISHMENT SERVER: onSend Event Fired');
-    console.log("SENT: " + code);
+    };
+    websocket.send(JSON.stringify(message));
+    console.log("ACCOMPLISHMENT SERVER: onSend Event Fired");
+    console.log(`SENT: ${code}`);
 }
 
-function waitForConnection() {
+function waitForConnection () {
     $("#loading").modal("hide");
     if (!isConnected) {
-        setInterval(function () {
-            // if (websocket == null) {
-            //     console.log("Cannot establish connection to ACCOMPLISHMENT SERVER... Reconnecting...");
-            // }
+        setTimeout(() => {
             if (websocket.readyState === 1) {
-                console.log("CONNECTION TO " + wsUri + " has been successfully established");
+                console.log(`Connection to ${wsUri} has been successfully established`);
                 isConnected = true;
-                return;
             } else {
-                console.log("Connection to ACCOMPLISHMENT SERVER lost... Reconnecting...");
+                console.log("Connection to DASHBOARD SERVER lost... Reconnecting...");
                 init();
-                waitForConnection();
-                if (reconnect < 20000) {
-                    reconnect += 1000;
-                }
             }
         }, reconnect);
     }
 }
 
-//***** AUTOMATION FUNCTIONS ******//
+//* **** AUTOMATION FUNCTIONS ******//

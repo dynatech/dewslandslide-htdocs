@@ -283,11 +283,39 @@ textarea {
         small:before {
             content: " ";
             border-left: 3px solid;
-            padding-left: 7px;
+            padding-left: 6px;
         }
     }
 
 // ===== END OF Page Header
+
+//=====
+// 
+// Scroll Bar
+//
+//=====
+
+/* width */
+::-webkit-scrollbar {
+   width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+   background: $secondary-grey; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+   background: $primary-orange; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+   background: $primary-red; 
+}
+
+// ===== END OF Scroll Bar
 
 //=====
 // 
@@ -409,18 +437,20 @@ textarea {
 
         &.btn-danger {
             background-color: $primary-red;
-            border-color: $primary-red;
         }
 
         &.btn-info {
             background-color: $secondary-blue;
-            border-color: $secondary-blue;
         }
 
         &.btn-default {
             background-color: $secondary-grey;
-            border-color: $secondary-grey;
             color: white;
+
+            &:hover {
+                background-color: lighten($secondary-grey, 5%);
+                color: white;
+            }
         }
     }
 

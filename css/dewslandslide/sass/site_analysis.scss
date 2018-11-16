@@ -3,6 +3,11 @@
  *
  *	Created by Kevin Dhale dela Cruz
  *	CSS file for Individual Site Pages
+ * 
+ *  P.S DO NOT EDIT any style in this CSS directly
+ *  on the CSS file! Edit the SCSS file located on the
+ *  SASS file folder and re-compile with the output path
+ *  set on the current path of the site_analysis.css folder. 
  *	
 ****/
 
@@ -15,22 +20,26 @@
 
 .breadcrumb {
     font-weight: 600;
+    background-color: $primary-blue;
+    color: white;
 }
 
 .section-title {
     font-size: 24px;
     font-weight: 600;
+    color: $primary-blue;
 }
 
 .section-subtitle {
     font-size: 18px;
+    color: $primary-blue;
 }
 
 .section {
     & > .row > hr {
         border: 0;
         margin-top: 10px;
-        background-color: #999999 !important;
+        background-color: $primary-blue !important;
         height: 1px;
     }
 }
@@ -39,13 +48,14 @@
     h4 {
         font-weight: 600;
         text-indent: 2em;
+        color: $primary-blue;
     }
 }
 
 .plot-title-hr {
     margin-top: 10px;
     margin-left: 20px;
-    border-color: #cccccc;
+    border-color: $primary-blue;
 }
 
 #options-bar {
@@ -55,6 +65,7 @@
 
 .options-section-title {
     font-weight: 600;
+    color: $primary-blue;
 
     hr {
         margin-top: 30px;

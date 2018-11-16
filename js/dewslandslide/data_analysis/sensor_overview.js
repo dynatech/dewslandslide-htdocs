@@ -62,7 +62,8 @@ function generateDataTables () {
         deactivatedSensors()
     ];
 
-    $.when(...deactivated).then((...args) => {
+    $.when(...deactivated)
+    .then((...args) => {
         args.forEach((obj) => {
             obj[0].forEach((info) => {
                 createTables(info[0], info[1], info[2], info[3]);
@@ -124,7 +125,7 @@ function createTables (data_source, tab_id, title, table_title) {
 
             table.find("#table-title").text(title).prop("hidden", false);
             table_row.find("#logger-name").text(info.logger_name.toUpperCase());
-            table_row.find("#date-deactivated").text(moment(info.date_deactivated).format("DD MMMM YYYY HH:mm"));
+            table_row.find("#date-deactivated").text(moment(info.date_deactivated).format("MMMM DD, YYYY, HH:mm"));
             table_template.append(table_row);
         });
     } else {
@@ -137,7 +138,7 @@ function createTables (data_source, tab_id, title, table_title) {
                 ["#logger-name", logger_name.toUpperCase()],
                 ["#time-delta", time_delta],
                 ["#data-presence", data_presence],
-                ["#last-data-available", moment(last_data).format("DD MMMM YYYY HH:mm")]
+                ["#last-data-available", moment(last_data).format("MMMM DD, YYYY, HH:mm")]
             ];
 
             const table_row = table_template
