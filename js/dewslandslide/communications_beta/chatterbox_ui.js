@@ -1,5 +1,6 @@
 let OPTIONS_STATUS = "hidden";
 let QUICK_ACCESS_STATUS = "hidden";
+let NETWORK_STATUS = "hidden";
 $(document).ready(() => {
 	initializeChatterboxPanelBehavior();
 	initializeOnClickShowPanelButton();
@@ -38,12 +39,27 @@ function initializeOnClickShowPanelButton(){
 		if(QUICK_ACCESS_STATUS == "hidden"){
 			$("#quick-access-panel").show(400);
 			$("#messages-panel").hide(400);
+			$("#network-panel").hide(400);
 			QUICK_ACCESS_STATUS = "showed";
 		}else {
 			$("#quick-access-panel").hide(400);
 			$("#messages-panel").show(400);
+			$("#network-panel").hide(400);
 			QUICK_ACCESS_STATUS = "hidden";
 		}
-		
+	});
+
+	$('#network-reference, #hide-network-display').click(() => {
+		if (NETWORK_STATUS == "hidden") {
+			$("#network-panel").show(400);
+			$("#messages-panel").hide(400);
+			$("#quick-access-panel").hide(400);
+			NETWORK_STATUS = "showed";
+		} else {
+			$("#network-panel").hide(400);
+			$("#messages-panel").show(400);
+			$("#quick-access-panel").hide(400);
+			NETWORK_STATUS = "hidden";
+		}
 	});
 }
