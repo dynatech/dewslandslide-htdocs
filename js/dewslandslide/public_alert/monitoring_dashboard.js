@@ -799,7 +799,7 @@ function initializeReleaseModalForm () {
                     const extend = /ND|[sg]0/gi.test(final.internal_alert_level);
                     if (list == null && moment(previous_validity).isSame(moment(final.timestamp_entry).add(30, "minutes"))) {
                         if (extend) final.extend_ND = "set";
-                        if (entry.rainfall === "rx") {
+                        if (entry.rainfall === "rx" || final.internal_alert_level.includes("x")) {
                             final.extend_rain_x = "set";
                         }
                     }
